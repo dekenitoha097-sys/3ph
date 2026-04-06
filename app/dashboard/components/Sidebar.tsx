@@ -10,7 +10,7 @@ export default function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
-    const { user, loading } = useSession();
+    const { user, loading } = useSession() as { user: any, loading: boolean };
 
     // Fermer le menu au clic sur un lien
     const handleNavClick = () => {
@@ -54,7 +54,7 @@ export default function Sidebar() {
         return 'Mr';
     };
 
-    const userRole = (user?.role && roleMap[user.role]) || 'student';
+    const userRole: 'student' | 'supervisor' | 'lab' | 'admin' = (user?.role && roleMap[user.role]) || 'student';
     const userTitle = user?.sexe ? getTitleBySex(user.sexe) : '';
     const userName = user ? `${userTitle} ${user.prenom} ${user.nom}` : 'Utilisateur';
 
@@ -89,7 +89,7 @@ export default function Sidebar() {
             { href: '/dashboard/analytics', label: 'Analyse', icon: BarChart3 },
             { href: '/dashboard/audit', label: 'Audit', icon: Settings },
         ],
-    };
+    } as const;
 
     const menuItems = menuConfig[userRole];
 
