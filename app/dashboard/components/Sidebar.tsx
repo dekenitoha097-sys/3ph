@@ -62,23 +62,19 @@ export default function Sidebar() {
     const menuConfig = {
         student: [
             { href: '/dashboard', label: 'Accueil', icon: Home },
-            { href: '/dashboard/demands', label: 'Mes Demandes', icon: FileText },
-            { href: '/dashboard/new-demand', label: 'Nouvelle Demande', icon: ShoppingCart },
+            { href: '/dashboard/all-demands', label: 'Mes Demandes', icon: FileText },
+            { href: '/dashboard/nouvelle-demande', label: 'Nouvelle Demande', icon: ShoppingCart },
             { href: '/dashboard/history', label: 'Historique', icon: LayoutDashboard },
         ],
         supervisor: [
             { href: '/dashboard', label: 'Accueil', icon: Home },
-            { href: '/dashboard/pending', label: 'À Examiner', icon: CheckCircle },
-            { href: '/dashboard/students', label: 'Mes Étudiants', icon: Users },
-            { href: '/dashboard/validated', label: 'Validées', icon: Package },
-            { href: '/dashboard/reports', label: 'Rapports', icon: BarChart3 },
+            { href: '/dashboard/all-demands', label: 'Demandes', icon: FileText },
         ],
         lab: [
             { href: '/dashboard', label: 'Accueil', icon: Home },
-            { href: '/dashboard/approved', label: 'À Commander', icon: ShoppingCart },
-            { href: '/dashboard/orders', label: 'Mes Commandes', icon: Package },
-            { href: '/dashboard/deliveries', label: 'Livraisons', icon: CheckCircle },
-            { href: '/dashboard/inventory', label: 'Inventaire', icon: BarChart3 },
+            { href: '/dashboard/all-demands', label: 'Demandes', icon: FileText },
+            { href: '/dashboard/composants', label: 'Composants', icon: Package },
+
         ],
         admin: [
             { href: '/dashboard', label: 'Accueil', icon: Home },
