@@ -185,12 +185,12 @@ export default function Sidebar() {
                 {/* Settings & Logout */}
                 <div className="p-3 space-y-2">
                     <Link
-                        href="/dashboard/settings"
+                        href="/dashboard/parametres"
                         onClick={handleNavClick}
                         className={`
                             flex items-center gap-3 px-4 py-2.5 rounded-lg
                             transition-all duration-200
-                            ${pathname === '/dashboard/settings'
+                            ${pathname === '/dashboard/parametres'
                                 ? 'bg-red-600 text-white shadow-lg'
                                 : 'text-blue-100 hover:bg-blue-700 hover:text-white'
                             }
