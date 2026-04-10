@@ -1,6 +1,6 @@
 'use client';
 
-import { Tag } from 'lucide-react';
+import { Tag, AlertCircle } from 'lucide-react';
 
 interface ContentStateProps {
   loading: boolean;
@@ -28,8 +28,12 @@ export default function ContentState({
 
   if (error) {
     return (
-      <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 md:p-6 text-red-700 text-base md:text-lg">
-        {error}
+      <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 md:p-6 flex items-start gap-4">
+        <AlertCircle size={24} className="text-red-600 flex-shrink-0 mt-1" />
+        <div>
+          <p className="text-red-700 font-bold">Erreur</p>
+          <p className="text-red-600 text-base md:text-lg mt-1">{error}</p>
+        </div>
       </div>
     );
   }

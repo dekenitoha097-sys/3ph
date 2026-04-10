@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import { useSession } from '@/hooks/useSession';
 import HeaderInfo from './components/HeaderInfo';
 import InfoGrid from './components/InfoGrid';
 import ComposantsList from './components/ComposantsList';
@@ -56,23 +57,25 @@ export default function DemandDetailPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
-  
+  const { user } = useSession();
+
   const [demande, setDemande] = useState<Demande | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (!id) return;
-    
+
     const fetchDemande = async () => {
       try {
         setLoading(true);
         const response = await fetch(`/api/dashboard/all-demands/${id}`);
-        
+
         if (!response.ok) {
           throw new Error('Demande non trouvée');
         }
-        
+
         const data = await response.json();
         setDemande(data.demande);
         setError('');
@@ -86,18 +89,104 @@ export default function DemandDetailPage() {
     fetchDemande();
   }, [id]);
 
+  async function handleUpdateDemande(id_st: number, progression: number) {
+    try {
+      const response = await fetch(`/api/dashboard/all-demands/update_demande`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_demande: id, id_status: id_st, progression: progression }),
+
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        setMessage('Erreur lors de la mise à jour de la demande');
+        throw new Error(errorData.message || 'Erreur lors de la mise à jour de la demande');
+      }
+
+      const data = await response.json();
+      setMessage(data.message || 'Demande mise à jour avec succès');
+
+      // Rafraîchir les données de la demande après la mise à jour
+      const updatedDemandeResponse = await fetch(`/api/dashboard/all-demands/${id}`);
+      if (!updatedDemandeResponse.ok) {
+        throw new Error('Erreur lors du rafraîchissement de la demande');
+      }
+      const updatedData = await updatedDemandeResponse.json();
+      setDemande(updatedData.demande);
+      setError('');
+
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la demande:', error);
+    }
+  }
+
+  setTimeout(() => {
+    setMessage('');
+  }, 5000);
+
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 md:p-8">
+      {
+        message && (
+          <div className="mb-4 bg-green-50 border-2 border-green-200 rounded-lg p-4 md:p-6 text-green-700 text-base md:text-lg">
+            {message}
+          </div>
+        )
+      }
       <div className="w-full">
         {/* Header with back button */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-gray-700 font-medium text-sm hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-all duration-200 ease-in-out"
+            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-gray-700 font-medium text-sm hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-all duration-200 ease-in-out"
           >
             <ArrowLeft size={18} className="stroke-2" />
             Retour
           </button>
+          <div>
+            {
+              user?.role == "encadrant" && (
+                <div>
+                  <button
+                    onClick={() => handleUpdateDemande(3,50)}
+                    className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 ease-in-out"
+                  >
+                    Valider la demande
+                  </button>
+                  <button
+                    onClick={() => handleUpdateDemande(2,25)}
+                    className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 ease-in-out"
+                  >
+                    Rejeter la demande
+
+                  </button>
+                </div>
+
+              )
+            }
+            {
+              user?.role == "laboratoire" && (
+                <div>
+                  <button
+                    onClick={() => handleUpdateDemande(4,75)}
+                    className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 ease-in-out"
+                  >
+                    Marquer comme disponible
+                  </button>
+                  <button
+                    onClick={() => handleUpdateDemande(5,100)}
+                    className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 ease-in-out"
+                  >
+                    Recuperer
+
+                  </button>
+                </div>
+              )
+
+            }
+          </div>
+
+
         </div>
 
         {/* Content */}
@@ -112,14 +201,14 @@ export default function DemandDetailPage() {
           </div>
         ) : demande ? (
           <div className="space-y-6">
-            <HeaderInfo 
+            <HeaderInfo
               titre={demande.titre}
               description={demande.description}
               status={demande.status}
               progression={demande.progression}
             />
 
-            <InfoGrid 
+            <InfoGrid
               etudiant={demande.etudiant}
               groupe={demande.groupe}
               encadrant={demande.encadrant}
@@ -128,7 +217,7 @@ export default function DemandDetailPage() {
 
             <ComposantsList composants={demande.composants} />
 
-            <HistoriqueSection 
+            <HistoriqueSection
               dateSoumission={demande.date_soumission}
               dateModification={demande.date_modification}
             />

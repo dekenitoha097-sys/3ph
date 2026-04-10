@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
 
 interface Composant {
@@ -36,24 +36,19 @@ export default function EditModal({ composant, isOpen, onClose, onSave }: EditMo
   const [error, setError] = useState<string | null>(null);
 
   // Mettre à jour le formulaire quand le composant change
-  const handleComposantChange = (newComposant: Composant | null) => {
-    if (newComposant) {
+  useEffect(() => {
+    if (composant) {
       setFormData({
-        nom: newComposant.nom,
-        reference: newComposant.reference,
-        photo_lien: newComposant.image_url || '',
-        quantite: newComposant.disponibilite,
-        Statut_Disponibilite: newComposant.statut_disponibilite,
-        commentaire: newComposant.description || '',
+        nom: composant.nom,
+        reference: composant.reference,
+        photo_lien: composant.image_url || '',
+        quantite: composant.disponibilite,
+        Statut_Disponibilite: composant.statut_disponibilite,
+        commentaire: composant.description || '',
       });
       setError(null);
     }
-  };
-
-  // Effect pour mettre à jour le formulaire
-  if (composant && formData.nom === '') {
-    handleComposantChange(composant);
-  }
+  }, [composant]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;

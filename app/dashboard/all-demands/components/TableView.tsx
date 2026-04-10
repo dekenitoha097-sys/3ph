@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { FileText, User, Users, Briefcase, Zap, TrendingUp, Calendar } from 'lucide-react';
 
 interface Demande {
   id_demande: number;
@@ -39,13 +40,13 @@ export default function TableView({ demandes, getStatusColor, formatDate }: Tabl
         <table className="w-full text-xs md:text-base">
           <thead className="bg-gray-50 border-b-2 border-gray-200">
             <tr>
-              <th className="px-2 md:px-8 py-3 md:py-5 text-left text-xs md:text-sm font-bold text-gray-700 uppercase">Titre</th>
-              <th className="hidden md:table-cell px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase">Étudiant</th>
-              <th className="hidden lg:table-cell px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase">Groupe</th>
-              <th className="hidden lg:table-cell px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase">Filière</th>
-              <th className="px-2 md:px-8 py-3 md:py-5 text-left text-xs md:text-sm font-bold text-gray-700 uppercase">Status</th>
-              <th className="hidden md:table-cell px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase">Progression</th>
-              <th className="px-2 md:px-8 py-3 md:py-5 text-left text-xs md:text-sm font-bold text-gray-700 uppercase">Date</th>
+              <th className="px-2 md:px-8 py-3 md:py-5 text-left text-xs md:text-sm font-bold text-gray-700 uppercase flex items-center gap-1 whitespace-nowrap"> <span className="inline-flex items-center gap-2"><FileText size={14} /> Titre</span> </th>
+              <th className="hidden md:table-cell px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase flex items-center  gap-1 whitespace-nowrap inline-flex"> <span className="inline-flex items-center gap-2"><User size={14} /> Étudiant</span> </th>
+              <th className="hidden lg:table-cell px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase flex items-center gap-1 whitespace-nowrap"><span className="inline-flex items-center gap-2"><Users size={14} /> Groupe</span></th>
+              <th className="hidden lg:table-cell px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase flex items-center gap-1 whitespace-nowrap"><span className="inline-flex items-center gap-2"><Briefcase size={14} /> Filière</span></th>
+              <th className="px-2 md:px-8 py-3 md:py-5 text-left text-xs md:text-sm font-bold text-gray-700 uppercase flex items-center gap-1 whitespace-nowrap"><span className="inline-flex items-center gap-2"><Zap size={14} /> Status</span></th>
+              <th className="hidden md:table-cell px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase flex items-center gap-1 whitespace-nowrap"><span className="inline-flex items-center gap-2"><TrendingUp size={14} /> Progression</span></th>
+              <th className="px-2 md:px-8 py-3 md:py-5 text-left text-xs md:text-sm font-bold text-gray-700 uppercase flex items-center gap-1 whitespace-nowrap"><span className="inline-flex items-center gap-2"><Calendar size={14} /> Date</span></th>
             </tr>
           </thead>
           <tbody>

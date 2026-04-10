@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, Filter, Calendar } from 'lucide-react';
+import { Search, Filter, Calendar, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface FilterSectionProps {
@@ -43,7 +43,7 @@ export default function FilterSection({
       }
     }
     fetchStatus();
-  },[libelle])
+  },[])
 
   useEffect(() => {
     async function fetchFiliere(){
@@ -83,8 +83,9 @@ export default function FilterSection({
         {hasActiveFilters && (
           <button
             onClick={onReset}
-            className="text-sm md:text-base text-blue-600 hover:text-blue-700 font-semibold w-fit"
+            className="flex items-center gap-2 text-sm md:text-base text-blue-600 hover:text-blue-700 font-semibold w-fit"
           >
+            <X size={16} />
             Réinitialiser
           </button>
         )}

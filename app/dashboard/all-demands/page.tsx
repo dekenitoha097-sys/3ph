@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { FileText, BarChart3 } from 'lucide-react';
 import FilterSection from './components/FilterSection';
 import ViewModeSelector from './components/ViewModeSelector';
 import TableView from './components/TableView';
@@ -112,7 +113,7 @@ export default function AllDemandsPage() {
     'valide': { bg: 'bg-green-50', text: 'text-green-700', badge: 'bg-green-100 text-green-800' },
     'rejete': { bg: 'bg-red-50', text: 'text-red-700', badge: 'bg-red-100 text-red-800' },
     'en_cours': { bg: 'bg-blue-50', text: 'text-blue-700', badge: 'bg-blue-100 text-blue-800' },
-    'approuve': { bg: 'bg-purple-50', text: 'text-purple-700', badge: 'bg-purple-100 text-purple-800' },
+    'recupere': { bg: 'bg-purple-50', text: 'text-purple-700', badge: 'bg-purple-100 text-purple-800' },
   } as Record<string, { bg: string; text: string; badge: string }>;
 
   const getStatusColor = (status: string) => {
@@ -130,9 +131,12 @@ export default function AllDemandsPage() {
       <div className="w-full">
         {/* Header with View Mode Toggle */}
         <div className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-0">
-          <div>
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3">Demandes</h1>
-            <p className="text-base md:text-lg text-gray-600">Gérez et consultez toutes vos demandes</p>
+          <div className="flex items-start gap-3 md:gap-4">
+            <FileText size={32} className="text-blue-600 flex-shrink-0 mt-1" />
+            <div>
+              <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3">Demandes</h1>
+              <p className="text-base md:text-lg text-gray-600">Gérez et consultez toutes vos demandes</p>
+            </div>
           </div>
           <div className="w-full md:w-auto">
             <ViewModeSelector viewMode={viewMode} onViewModeChange={setViewMode} />
@@ -163,7 +167,8 @@ export default function AllDemandsPage() {
         </ContentState>
 
         {/* Stats Footer */}
-        <div className="mt-8 bg-white rounded-lg shadow-sm p-4 md:p-6">
+        <div className="mt-8 bg-white rounded-lg shadow-sm p-4 md:p-6 flex items-center gap-4">
+          <BarChart3 size={24} className="text-blue-600 flex-shrink-0" />
           <p className="text-base md:text-lg text-gray-700 font-semibold">
             <span className="font-bold text-gray-900 text-lg md:text-xl">{demandes.length}</span> demande(s) affichée(s)
           </p>

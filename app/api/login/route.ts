@@ -65,8 +65,7 @@ export async function POST(req: Request) {
                 prenom: user.prenom,
                 email: user.email,
                 role: user.role,
-                sexe: user.sexe,
-                id_groupe: user.id_groupe
+                sexe: user.sexe
             },
             process.env.JWT_SECRET as string,
             {

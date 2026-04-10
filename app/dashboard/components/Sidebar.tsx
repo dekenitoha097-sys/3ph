@@ -79,11 +79,7 @@ export default function Sidebar() {
         admin: [
             { href: '/dashboard', label: 'Accueil', icon: Home },
             { href: '/dashboard/all-demands', label: 'Toutes Demandes', icon: FileText },
-            { href: '/dashboard/users', label: 'Utilisateurs', icon: Users },
-            { href: '/dashboard/components', label: 'Composants', icon: Package },
-            { href: '/dashboard/suppliers', label: 'Fournisseurs', icon: ShoppingCart },
-            { href: '/dashboard/analytics', label: 'Analyse', icon: BarChart3 },
-            { href: '/dashboard/audit', label: 'Audit', icon: Settings },
+            { href: '/dashboard/utilisateur', label: 'Utilisateurs', icon: Users },
         ],
     } as const;
 
@@ -111,7 +107,7 @@ export default function Sidebar() {
         <>
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+                    className="fixed inset-0 bg-black/80 z-30 lg:hidden"
                     onClick={() => setIsOpen(false)}
                 />
             )}

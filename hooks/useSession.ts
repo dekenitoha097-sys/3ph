@@ -5,15 +5,24 @@ export function useSession() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const fetchAndSetUser = async () => {
+        try {
+            const data = await fetchSession();
+            setUser(data?.user || null);
+        } catch (error) {
+            console.error('Error fetching session:', error);
+        }
+    };
+
     useEffect(() => {
-        fetchSession()
-            .then(data => {
-                setUser(data?.user || null);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        fetchAndSetUser().finally(() => {
+            setLoading(false);
+        });
     }, []);
 
-    return { user, loading };
+    const refreshSession = async () => {
+        return fetchAndSetUser();
+    };
+
+    return { user, loading, refreshSession };
 }

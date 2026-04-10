@@ -59,12 +59,20 @@ export async function GET(request: NextRequest) {
           FROM status 
           WHERE libelle IN (?, ?, ?)
         `;
-        // ⚠️ correction ici (pas 'rejete' car pas dans ta table)
         params = ["en_attente", "valide", "en_revision"];
         break;
 
       case "admin":
         query = "SELECT id_status, libelle FROM status";
+        break;
+
+      case "laboratoire":
+        query = `
+          SELECT id_status, libelle
+          FROM status
+          WHERE libelle IN (?,?,?)
+        `;
+        params = ["pret","recupere", "valide"];
         break;
 
       default:
@@ -77,7 +85,6 @@ export async function GET(request: NextRequest) {
     console.log("QUERY:", query);
     console.log("PARAMS:", params);
 
-    // 🧠 exécution sécurisée (fix bug params vide)
     let rows;
 
     if (params.length > 0) {

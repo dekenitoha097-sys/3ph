@@ -73,8 +73,7 @@ export async function GET(request: NextRequest) {
             query += ' AND d.id_encadrant = ?';
             params.push(user.id);
         } else if (user.role === 'laboratoire') {
-            query += ' AND d.id_laboratoire = ?';
-            params.push(user.id);
+            query += 'AND d.id_status IN (3,4,5)'; // Affiche les demandes validées ou en cours de validation
         }
         // admin voit toutes les demandes
 
