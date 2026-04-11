@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         }
 
         const [rows]: any = await pool.query(
-            'SELECT id_utilisateur,nom,prenom, mot_de_passe,role,email ,sexe FROM utilisateur WHERE email = ?',
+            'SELECT id_utilisateur,nom,prenom, id_groupe ,mot_de_passe,role,email ,sexe FROM utilisateur WHERE email = ?',
             [email]
         );
 
@@ -60,6 +60,7 @@ export async function POST(req: Request) {
         const token = jwt.sign(
             {
                 id: user.id_utilisateur,
+                id_etudiant: user.id_utilisateur,
                 nom: user.nom,
                 prenom: user.prenom,
                 email: user.email,
