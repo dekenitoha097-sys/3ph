@@ -6,6 +6,7 @@ import FilterBar from './components/FilterBar';
 import ComposantCard from './components/ComposantCard';
 import PaginationControls from './components/PaginationControls';
 import EditModal from './components/EditModal';
+import CreateComposantModal from './components/CreateComposantModal';
 
 interface Composant {
   id_composant: number;
@@ -50,6 +51,9 @@ export default function ComposantsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: number; nom: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Modal création
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Debounce pour la recherche
   const [searchDebounce, setSearchDebounce] = useState('');
@@ -216,6 +220,17 @@ export default function ComposantsPage() {
           <p className="text-gray-600">
             Découvrez tous les composants disponibles au laboratoire
           </p>
+
+          <div>
+            <button 
+              onClick={() => setIsCreateModalOpen(true)}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2
+             bg-green-600 hover:bg-green-700 text-white rounded-lg
+             transition-all duration-200 cursor-pointer
+            ">
+              Ajouter un composant
+            </button>
+          </div>
         </div>
 
         {/* Filtres */}
@@ -341,6 +356,13 @@ export default function ComposantsPage() {
             </div>
           </div>
         )}
+
+        {/* Modal Création */}
+        <CreateComposantModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={fetchComposants}
+        />
       </div>
     </div>
   );
