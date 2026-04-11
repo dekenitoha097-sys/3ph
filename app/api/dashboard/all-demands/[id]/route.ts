@@ -135,3 +135,118 @@ export async function GET(
     }
   }
 }
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  let connection;
+  try {
+    const { id } = await params;
+    const body = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID requis' }, { status: 400 });
+    }
+
+    const { titre, description, composants } = body;
+
+    if (!titre || !description) {
+      return NextResponse.json(
+        { error: 'Titre et description requis' },
+        { status: 400 }
+      );
+    }
+
+    connection = await pool.getConnection();
+
+    // Vérifier que la demande existe
+    const [existingDemande] = await connection.execute(
+      'SELECT id_demande FROM demande WHERE id_demande = ?',
+      [id]
+    );
+
+    if ((existingDemande as any[]).length === 0) {
+      return NextResponse.json({ error: 'Demande non trouvée' }, { status: 404 });
+    }
+
+    // Mettre à jour la demande
+    await connection.execute(
+      `UPDATE demande 
+       SET titre = ?, description = ?, date_modification = NOW() 
+       WHERE id_demande = ?`,
+      [titre, description, id]
+    );
+
+    // Gérer les composants
+    if (composants && Array.isArray(composants)) {
+      // Récupérer les lignes existantes avec leurs composants
+      const [existingLines] = await connection.execute(
+        'SELECT id_ligne, id_composant FROM ligne_demande WHERE id_demande = ?',
+        [id]
+      );
+
+      const existingLineIds = new Set((existingLines as any[]).map((l) => l.id_ligne));
+      const existingComposantIds = new Set((existingLines as any[]).map((l) => l.id_composant));
+
+      // Traiter chaque composant
+      for (const composant of composants) {
+        if (composant.id_ligne) {
+          // Mise à jour d'un composant existant
+          await connection.execute(
+            `UPDATE ligne_demande 
+             SET quantite_demandee = ?, commentaire_labo = ? 
+             WHERE id_ligne = ? AND id_demande = ?`,
+            [
+              composant.quantite_demandee || 0,
+              composant.commentaire_labo || null,
+              composant.id_ligne,
+              id,
+            ]
+          );
+          existingLineIds.delete(composant.id_ligne);
+        } else {
+          // Ajout d'un nouveau composant (seulement s'il n'existe pas déjà)
+          if (composant.id_composant && !existingComposantIds.has(composant.id_composant)) {
+            await connection.execute(
+              `INSERT INTO ligne_demande 
+               (id_demande, id_composant, quantite_demandee, commentaire_labo, disponible)
+               VALUES (?, ?, ?, ?, FALSE)`,
+              [
+                id,
+                composant.id_composant,
+                composant.quantite_demandee || 0,
+                composant.commentaire_labo || null,
+              ]
+            );
+            existingComposantIds.add(composant.id_composant);
+          }
+        }
+      }
+
+      // Supprimer les lignes qui ne sont plus dans la demande
+      for (const lineId of existingLineIds) {
+        await connection.execute(
+          'DELETE FROM ligne_demande WHERE id_ligne = ?',
+          [lineId]
+        );
+      }
+    }
+
+    return NextResponse.json({
+      message: 'Demande mise à jour avec succès',
+      id_demande: id,
+    });
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de la demande:', error);
+    return NextResponse.json(
+      { error: 'Erreur lors de la mise à jour de la demande' },
+      { status: 500 }
+    );
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+}
+

@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Edit2 } from 'lucide-react';
 import { useSession } from '@/hooks/useSession';
 import HeaderInfo from './components/HeaderInfo';
 import InfoGrid from './components/InfoGrid';
 import ComposantsList from './components/ComposantsList';
 import HistoriqueSection from './components/HistoriqueSection';
+import DiscussionPanel from './components/DiscussionPanel';
 
 interface Demande {
   id_demande: number;
@@ -143,18 +144,32 @@ export default function DemandDetailPage() {
             <ArrowLeft size={18} className="stroke-2" />
             Retour
           </button>
-          <div>
+          <div className="flex gap-2">
+            {user?.role === 'etudiant' && demande?.status !== 'valide' && demande?.status !== 'pret' && demande?.status !== 'recupere' && (
+              <button
+                onClick={() => router.push(`/dashboard/all-demands/${id}/edit`)}
+                className="inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-blue-700 font-medium text-sm hover:text-blue-900 hover:bg-blue-200 rounded-lg transition-all duration-200 ease-in-out"
+              >
+                <Edit2 size={18} className="stroke-2" />
+                Modifier
+              </button>
+            )}
+            {user?.role === 'etudiant' && (demande?.status === 'valide' || demande?.status === 'pret' || demande?.status === 'recupere') && (
+              <span className="inline-flex items-center gap-2 px-4 py-2.5 text-gray-600 font-medium text-sm bg-gray-200 rounded-lg cursor-not-allowed">
+                Ne peut plus être modifiée
+              </span>
+            )}
             {
               user?.role == "encadrant" && (
                 <div>
                   <button
-                    onClick={() => handleUpdateDemande(3,50)}
+                    onClick={() => handleUpdateDemande(3, 50)}
                     className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 ease-in-out"
                   >
                     Valider la demande
                   </button>
                   <button
-                    onClick={() => handleUpdateDemande(2,25)}
+                    onClick={() => handleUpdateDemande(2, 25)}
                     className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 ease-in-out"
                   >
                     Rejeter la demande
@@ -168,13 +183,13 @@ export default function DemandDetailPage() {
               user?.role == "laboratoire" && (
                 <div>
                   <button
-                    onClick={() => handleUpdateDemande(4,75)}
+                    onClick={() => handleUpdateDemande(4, 75)}
                     className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 ease-in-out"
                   >
                     Marquer comme disponible
                   </button>
                   <button
-                    onClick={() => handleUpdateDemande(5,100)}
+                    onClick={() => handleUpdateDemande(5, 100)}
                     className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 ease-in-out"
                   >
                     Recuperer
@@ -224,6 +239,9 @@ export default function DemandDetailPage() {
           </div>
         ) : null}
       </div>
+
+      {/* Discussion Panel */}
+      <DiscussionPanel id_demande={parseInt(id)} userRole={user?.role} />
     </div>
   );
 }
