@@ -9,6 +9,38 @@ interface CreateComposantRequest {
   commentaire?: string | null;
 }
 
+export async function GET() {
+  try {
+    const [composants] = await pool.query(`
+      SELECT
+        id_composant,
+        nom,
+        reference,
+        photo_lien AS image_url,
+        existe,
+        quantite AS disponibilite,
+        commentaire AS description,
+        Statut_Disponibilite AS statut_disponibilite,
+        created_at
+      FROM composant 
+      WHERE existe = 0
+      ORDER BY created_at DESC
+    `);
+
+    return NextResponse.json({
+      success: true,
+      composants: composants || [],
+      total: (composants as any[]).length,
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des composants custom:', error);
+    return NextResponse.json(
+      { error: 'Erreur serveur lors de la récupération des composants' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body: CreateComposantRequest = await req.json();

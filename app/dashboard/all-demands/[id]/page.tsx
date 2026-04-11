@@ -240,8 +240,10 @@ export default function DemandDetailPage() {
         ) : null}
       </div>
 
-      {/* Discussion Panel */}
-      <DiscussionPanel id_demande={parseInt(id)} userRole={user?.role} />
+      {/* Discussion Panel - Uniquement pour étudiant et encadrant */}
+      {user?.role && (user.role === 'etudiant' || user.role === 'encadrant') && (
+        <DiscussionPanel id_demande={parseInt(id)} userRole={user.role} />
+      )}
     </div>
   );
 }

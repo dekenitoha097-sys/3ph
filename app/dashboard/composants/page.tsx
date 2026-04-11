@@ -7,6 +7,7 @@ import ComposantCard from './components/ComposantCard';
 import PaginationControls from './components/PaginationControls';
 import EditModal from './components/EditModal';
 import CreateComposantModal from './components/CreateComposantModal';
+import OrderComposantsModal from './components/OrderComposantsModal';
 
 interface Composant {
   id_composant: number;
@@ -14,6 +15,17 @@ interface Composant {
   reference: string;
   image_url: string | null;
   existe: boolean;
+  disponibilite: number;
+  description: string;
+  statut_disponibilite: string;
+  created_at: string;
+}
+
+interface CustomComposant {
+  id_composant: number;
+  nom: string;
+  reference: string;
+  image_url: string | null;
   disponibilite: number;
   description: string;
   statut_disponibilite: string;
@@ -54,6 +66,11 @@ export default function ComposantsPage() {
 
   // Modal création
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Modal composants custom
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
+  const [customComposants, setCustomComposants] = useState<CustomComposant[]>([]);
+  const [loadingCustom, setLoadingCustom] = useState(false);
 
   // Debounce pour la recherche
   const [searchDebounce, setSearchDebounce] = useState('');
@@ -221,14 +238,35 @@ export default function ComposantsPage() {
             Découvrez tous les composants disponibles au laboratoire
           </p>
 
-          <div>
+          <div className="flex gap-3 mt-4">
             <button 
               onClick={() => setIsCreateModalOpen(true)}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2
+              className="inline-flex items-center gap-2 px-4 py-2
              bg-green-600 hover:bg-green-700 text-white rounded-lg
              transition-all duration-200 cursor-pointer
             ">
               Ajouter un composant
+            </button>
+            <button 
+              onClick={async () => {
+                setLoadingCustom(true);
+                try {
+                  const response = await fetch('/api/composants/custom');
+                  if (response.ok) {
+                    const data = await response.json();
+                    setCustomComposants(data.composants || []);
+                  }
+                } catch (err) {
+                  console.error('Erreur:', err);
+                }
+                setLoadingCustom(false);
+                setIsCustomModalOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2
+             bg-orange-600 hover:bg-orange-700 text-white rounded-lg
+             transition-all duration-200 cursor-pointer
+            ">
+              Composants à commander
             </button>
           </div>
         </div>
@@ -362,6 +400,13 @@ export default function ComposantsPage() {
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSuccess={fetchComposants}
+        />
+
+        {/* Modal Composants Custom */}
+        <OrderComposantsModal
+          isOpen={isCustomModalOpen}
+          composants={customComposants}
+          onClose={() => setIsCustomModalOpen(false)}
         />
       </div>
     </div>
