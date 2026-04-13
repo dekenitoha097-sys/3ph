@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Users } from 'lucide-react';
 import UserFilters from './components/UserFilters';
 import UserTable from './components/UserTable';
+import EditRoleModal from './components/EditRoleModal';
 
 interface Utilisateur {
   id_utilisateur: number;
@@ -18,6 +19,8 @@ export default function UtilisateurPage() {
   const [utilisateurs, setUtilisateurs] = useState<Utilisateur[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<Utilisateur | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     nom: '',
@@ -86,6 +89,17 @@ export default function UtilisateurPage() {
 
   const hasActiveFilters = Object.values(filters).some((v) => v !== '');
 
+  // Handlers pour l'édition des rôles
+  const handleEditUser = (user: Utilisateur) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    // Recharger les utilisateurs après modification
+    fetchUtilisateurs();
+  };
+
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="w-full mx-auto">
@@ -115,6 +129,18 @@ export default function UtilisateurPage() {
           utilisateurs={utilisateurs}
           loading={loading}
           error={error}
+          onEdit={handleEditUser}
+        />
+
+        {/* Edit Role Modal */}
+        <EditRoleModal
+          isOpen={isEditModalOpen}
+          utilisateur={editingUser}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingUser(null);
+          }}
+          onSuccess={handleEditSuccess}
         />
       </div>
     </div>

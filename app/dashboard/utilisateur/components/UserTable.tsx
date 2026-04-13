@@ -1,6 +1,6 @@
 'use client';
 
-import { Mail, User, ShieldCheck, Loader2 } from 'lucide-react';
+import { Mail, User, ShieldCheck, Loader2, Edit2 } from 'lucide-react';
 
 interface Utilisateur {
   id_utilisateur: number;
@@ -15,6 +15,7 @@ interface UserTableProps {
   utilisateurs: Utilisateur[];
   loading: boolean;
   error: string | null;
+  onEdit?: (utilisateur: Utilisateur) => void;
 }
 
 const getRoleColor = (role: string) => {
@@ -37,7 +38,7 @@ const getRoleLabel = (role: string) => {
   return labels[role] || role;
 };
 
-export default function UserTable({ utilisateurs, loading, error }: UserTableProps) {
+export default function UserTable({ utilisateurs, loading, error, onEdit }: UserTableProps) {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm p-8 text-center">
@@ -76,6 +77,7 @@ export default function UserTable({ utilisateurs, loading, error }: UserTablePro
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Rôle</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date d'inscription</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -103,6 +105,15 @@ export default function UserTable({ utilisateurs, loading, error }: UserTablePro
                       {new Date(user.created_at).toLocaleDateString('fr-FR')}
                     </span>
                   </td>
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      onClick={() => onEdit?.(user)}
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors font-medium text-sm"
+                    >
+                      <Edit2 size={16} />
+                      Modifier
+                    </button>
+                  </td>
                 </tr>
               );
             })}
@@ -129,6 +140,13 @@ export default function UserTable({ utilisateurs, loading, error }: UserTablePro
               <p className="text-xs text-gray-500">
                 {new Date(user.created_at).toLocaleDateString('fr-FR')}
               </p>
+              <button
+                onClick={() => onEdit?.(user)}
+                className="w-full mt-3 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors font-medium text-sm"
+              >
+                <Edit2 size={16} />
+                Modifier le rôle
+              </button>
             </div>
           );
         })}

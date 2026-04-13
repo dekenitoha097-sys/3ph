@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         }
 
         const [rows]: any = await pool.query(
-            'SELECT id_utilisateur,nom,prenom, id_groupe ,mot_de_passe,role,email ,sexe FROM utilisateur WHERE email = ?',
+            'SELECT id_utilisateur,nom,prenom, id_groupe ,mot_de_passe,role,email ,sexe,email_verified FROM utilisateur WHERE email = ?',
             [email]
         );
 
@@ -52,6 +52,14 @@ export async function POST(req: Request) {
         if (!isMatch) {
             return NextResponse.json(
                 { message: 'Email ou mot de passe incorrect' },
+                { status: 401 }
+            );
+        }
+
+        // Vérifier que l'email a été confirmé
+        if (!user.email_verified) {
+            return NextResponse.json(
+                { message: 'Veuillez vérifier votre email avant de vous connecter' },
                 { status: 401 }
             );
         }
