@@ -1,8 +1,19 @@
 import { useEffect, useState } from "react";
 import { fetchSession } from "../lib/auth";
 
+interface User {
+    id?: number;
+    id_utilisateur?: number;
+    nom?: string;
+    prenom?: string;
+    email?: string;
+    role?: string;
+    sexe?: string;
+    id_groupe?: number;
+}
+
 export function useSession() {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     const fetchAndSetUser = async () => {

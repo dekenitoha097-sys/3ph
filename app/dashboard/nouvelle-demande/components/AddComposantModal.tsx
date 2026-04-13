@@ -12,6 +12,7 @@ interface Composant {
   image_url: string | null;
   disponibilite: number;
   description: string;
+  statut_disponibilite: string;
   created_at: string;
 }
 

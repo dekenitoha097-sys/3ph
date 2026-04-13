@@ -9,7 +9,7 @@ interface ComposantToOrder {
   reference: string;
   image_url: string | null;
   disponibilite: number;
-  description: string;
+  description: string | null;
   created_at: string;
 }
 

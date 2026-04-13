@@ -80,6 +80,7 @@ export default function Sidebar() {
             { href: '/dashboard', label: 'Accueil', icon: Home },
             { href: '/dashboard/all-demands', label: 'Toutes Demandes', icon: FileText },
             { href: '/dashboard/utilisateur', label: 'Utilisateurs', icon: Users },
+            { href: '/dashboard/gestion-des-affectations', label: 'Gestion des Affectations', icon: BarChart3 },
         ],
     } as const;
 

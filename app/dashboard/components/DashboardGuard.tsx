@@ -30,7 +30,7 @@ export default function DashboardGuard({ children }: DashboardGuardProps) {
           const data = await response.json();
           // Filtrer pour ne garder que les strings valides
           const validGroupes = (data.groupes || []).filter(
-            (groupe) => typeof groupe === 'string' && groupe.trim().length > 0
+            (groupe: any) => typeof groupe === 'string' && groupe.trim().length > 0
           );
           setGroupes(validGroupes);
           setFilteredGroupes(validGroupes);

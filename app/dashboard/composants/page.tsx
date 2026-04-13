@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2,Plus } from 'lucide-react';
 import FilterBar from './components/FilterBar';
 import ComposantCard from './components/ComposantCard';
 import PaginationControls from './components/PaginationControls';
@@ -16,7 +16,7 @@ interface Composant {
   image_url: string | null;
   existe: boolean;
   disponibilite: number;
-  description: string;
+  description: string | null;
   statut_disponibilite: string;
   created_at: string;
 }
@@ -27,7 +27,7 @@ interface CustomComposant {
   reference: string;
   image_url: string | null;
   disponibilite: number;
-  description: string;
+  description: string | null;
   statut_disponibilite: string;
   created_at: string;
 }
@@ -245,7 +245,7 @@ export default function ComposantsPage() {
              bg-green-600 hover:bg-green-700 text-white rounded-lg
              transition-all duration-200 cursor-pointer
             ">
-              Ajouter un composant
+              <Plus /> Ajouter un composant
             </button>
             <button 
               onClick={async () => {

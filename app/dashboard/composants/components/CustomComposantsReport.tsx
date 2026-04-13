@@ -9,7 +9,7 @@ interface CustomComposant {
   reference: string;
   image_url: string | null;
   disponibilite: number;
-  description: string;
+  description: string | null;
   statut_disponibilite: string;
   created_at: string;
 }
