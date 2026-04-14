@@ -77,9 +77,7 @@ export default function RegisterPage() {
             }
 
             setSuccess(true);
-            setTimeout(() => {
-                router.push('/login');
-            }, 2000);
+            // Ne pas rediriger automatiquement - laisser l'utilisateur voir le message
 
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
@@ -164,32 +162,23 @@ export default function RegisterPage() {
                                         />
                                     </div>
 
-                                    {/* Welcome text */}
-                                    <div className="mb-6">
-                                        <h2 className="text-2xl font-bold text-gray-900 mb-1">Inscription</h2>
-                                        <p className="text-gray-600 text-sm">Créez votre compte HESTIM</p>
-                                    </div>
+                                    {!success && (
+                                        <>
+                                            <div className="mb-6">
+                                                <h2 className="text-2xl font-bold text-gray-900 mb-1">Inscription</h2>
+                                                <p className="text-gray-600 text-sm">Créez votre compte HESTIM</p>
+                                            </div>
 
-                                    {/* Messages d'erreur ou succès */}
-                                    {error && (
-                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex gap-2 animate-slideIn">
-                                            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                                            <p className="text-red-700 text-sm">{error}</p>
-                                        </div>
-                                    )}
+                                            {error && (
+                                                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex gap-2 animate-slideIn">
+                                                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                                                    <p className="text-red-700 text-sm">{error}</p>
+                                                </div>
+                                            )}
 
-                                    {success && (
-                                        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex gap-2 animate-slideIn">
-                                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                            <p className="text-green-700 text-sm">Inscription réussie! Redirection...</p>
-                                        </div>
-                                    )}
-
-                                    {/* Form */}
-                                    <form onSubmit={handleSubmit} className="space-y-3">
-                                        {/* Nom et Prenom */}
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div>
+                                            <form onSubmit={handleSubmit} className="space-y-3">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
                                                 <label htmlFor="nom" className="block text-xs font-medium text-gray-700 mb-1">
                                                     Nom
                                                 </label>
@@ -334,13 +323,67 @@ export default function RegisterPage() {
                                         >
                                             {loading && <Loader className="w-4 h-4 animate-spin" />}
                                             {success ? '✓ Inscrit!' : loading ? 'Inscription...' : 'S\'Inscrire'}
-                                        </button>
-                                    </form>
+                                                </button>
+                                            </form>
 
-                                    {/* Login link */}
-                                    <p className="mt-4 text-center text-sm text-gray-600">
-                                        Vous avez un compte? <Link href="/login" className="text-red-600 hover:text-red-700 font-semibold">Se connecter</Link>
-                                    </p>
+                                            <p className="mt-4 text-center text-sm text-gray-600">
+                                                Vous avez un compte? <Link href="/login" className="text-red-600 hover:text-red-700 font-semibold">Se connecter</Link>
+                                            </p>
+                                        </>
+                                    )}
+
+                                    {success && (
+                                        <div className="text-center py-8">
+                                            <div className="mb-6 flex justify-center">
+                                                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                                                    <CheckCircle className="w-10 h-10 text-green-600" />
+                                                </div>
+                                            </div>
+                                            <h2 className="text-2xl font-bold text-gray-900 mb-4">🎉 Inscription réussie!</h2>
+                                            <div className="bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-green-500 rounded-lg p-5 mb-6">
+                                                <p className="text-gray-700 mb-2">
+                                                    Un email de vérification a été envoyé à:
+                                                </p>
+                                                <p className="font-semibold text-lg text-blue-600 mb-4">{formData.email}</p>
+                                                <p className="text-sm text-gray-600">
+                                                    ⚠️ Avant de pouvoir vous connecter, vous devez d'abord <span className="font-bold text-red-600">vérifier votre adresse email</span>.
+                                                </p>
+                                            </div>
+                                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+                                                <p className="text-gray-900 font-bold text-center mb-3 text-lg">📋 Prochaines étapes:</p>
+                                                <ol className="text-gray-700 text-sm space-y-3">
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">1</span>
+                                                        <span>Ouvrez votre boîte mail (recherchez un email de HESTIM)</span>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">2</span>
+                                                        <span>Cliquez sur le lien <span className="font-semibold">"Vérifier mon email"</span></span>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">3</span>
+                                                        <span>Confirmez votre adresse email</span>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">4</span>
+                                                        <span>Retournez vous connecter avec vos identifiants</span>
+                                                    </li>
+                                                </ol>
+                                            </div>
+                                            <p className="text-gray-600 text-xs mb-6 italic">
+                                                💡 N'oubliez pas de vérifier votre dossier SPAM si vous ne voyez pas l'email
+                                            </p>
+                                            <button
+                                                onClick={() => router.push('/login')}
+                                                className="w-full py-3 bg-gradient-to-r from-blue-600 to-red-600 text-white font-bold rounded-lg hover:from-blue-700 hover:to-red-700 transition-all duration-200 shadow-lg transform hover:scale-105"
+                                            >
+                                                ← Retourner à la connexion
+                                            </button>
+                                            <p className="text-gray-500 text-xs mt-4">
+                                                Une fois votre email vérifié, vous pourrez vous connecter normalement
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Footer */}
