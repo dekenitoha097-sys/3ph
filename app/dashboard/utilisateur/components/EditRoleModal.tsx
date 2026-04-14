@@ -5,7 +5,7 @@ import { X, Loader } from 'lucide-react';
 
 interface EditRoleModalProps {
   isOpen: boolean;
-  utilisateur: { id_utilisateur: number; nom: string; prenom: string; role: string } | null;
+  utilisateur: { id_utilisateur: number; nom: string; prenom: string; role: string; email: string } | null;
   onClose: () => void;
   onSuccess: () => void;
 }

@@ -91,7 +91,7 @@ export default function AssignmentModal({
             label="Groupe"
             options={groups.map(g => ({ id: g.id, name: g.name }))}
             value={selectedGroup}
-            onChange={setSelectedGroup}
+            onChange={(id) => setSelectedGroup(id as string)}
             placeholder="Chercher un groupe..."
           />
 
@@ -102,7 +102,7 @@ export default function AssignmentModal({
               name: e.name
             }))}
             value={selectedEncadrant}
-            onChange={setSelectedEncadrant}
+            onChange={(id) => setSelectedEncadrant(id as string)}
             placeholder="Chercher un encadrant..."
           />
         </div>
