@@ -48,10 +48,7 @@ export default function DashboardGuard({ children }: DashboardGuardProps) {
   useEffect(() => {
     if (loading) return;
 
-    // Si pas d'id_groupe, afficher la modal
-    if (!user?.id_groupe && user?.role === 'etudiant') {
-      setShowModal(true);
-    }
+    // La modal n'est plus affichée ici (uniquement dans nouvelle-demande)
   }, [user, loading]);
 
   // Fermer le dropdown quand on clique en dehors

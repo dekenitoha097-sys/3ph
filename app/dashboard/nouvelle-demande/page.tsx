@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
+import GroupeRequiredModal from '@/app/dashboard/components/GroupeRequiredModal';
 import InfoForm from './components/InfoForm';
 import ComposantsListSection from './components/ComposantsListSection';
 import AddComposantModal from './components/AddComposantModal';
@@ -30,8 +31,9 @@ interface ComposantSelectionne {
 
 export default function NouvelleDemandePage() {
   const router = useRouter();
-  const { user, loading: sessionLoading } = useSession() as { user: any, loading: boolean };
+  const { user, loading: sessionLoading, refreshSession } = useSession() as { user: any, loading: boolean, refreshSession: () => Promise<void> };
   
+  const [showGroupeModal, setShowGroupeModal] = useState(false);
   const [titre, setTitre] = useState('');
   const [description, setDescription] = useState('');
 
@@ -71,6 +73,13 @@ export default function NouvelleDemandePage() {
 
     fetchComposants();
   }, []);
+
+  // Vérifier si l'utilisateur a un groupe
+  useEffect(() => {
+    if (!sessionLoading && user && user.role === 'etudiant' && !user.id_groupe) {
+      setShowGroupeModal(true);
+    }
+  }, [user, sessionLoading]);
 
   // Effacer le message d'erreur après 5 secondes
   useEffect(() => {
@@ -145,6 +154,15 @@ export default function NouvelleDemandePage() {
     const updated = [...composantsSelectionnes];
     updated[index].quantite_demandee = Math.max(1, quantite);
     setComposantsSelectionnes(updated);
+  };
+
+  // Gérer la fermeture de la modale de groupe
+  const handleGroupeModalClose = async (success: boolean) => {
+    setShowGroupeModal(false);
+    if (success) {
+      // Rafraîchir la session pour obtenir le nouvel id_groupe
+      await refreshSession();
+    }
   };
 
   // Soumettre la demande
@@ -254,6 +272,8 @@ export default function NouvelleDemandePage() {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 md:p-8">
+      <GroupeRequiredModal isOpen={showGroupeModal} onClose={handleGroupeModalClose} />
+
       <div className="w-full">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Nouvelle Demande</h1>
