@@ -14,17 +14,19 @@ interface InfoGridProps {
     filiere: string;
     annee: string;
   };
-  encadrant?: {
+  encadrants?: Array<{
+    id_utilisateur: number;
     nom: string;
     prenom: string;
-  } | null;
+    email: string;
+  }>;
   laboratoire?: {
     nom: string;
     email: string;
   } | null;
 }
 
-export default function InfoGrid({ etudiant, groupe, encadrant, laboratoire }: InfoGridProps) {
+export default function InfoGrid({ etudiant, groupe, encadrants, laboratoire }: InfoGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Étudiant */}
@@ -95,18 +97,28 @@ export default function InfoGrid({ etudiant, groupe, encadrant, laboratoire }: I
       </div>
       )}
 
-      {/* Encadrant */}
-      {encadrant && (
+      {/* Encadrants */}
+      {encadrants && encadrants.length > 0 && (
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-md p-6 border border-green-200">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-green-600 rounded-lg">
               <Briefcase size={24} className="text-white" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900">Encadrant</h2>
+            <h2 className="text-lg font-bold text-gray-900">Encadrants ({encadrants.length})</h2>
           </div>
-          <div className="flex items-start gap-3">
-            <User size={18} className="text-green-500 mt-1 flex-shrink-0" />
-            <p className="text-base font-semibold text-gray-900">{encadrant.prenom} {encadrant.nom}</p>
+          <div className="space-y-3">
+            {encadrants.map((enc) => (
+              <div key={enc.id_utilisateur} className="pb-3 border-b last:pb-0 last:border-b-0">
+                <div className="flex items-start gap-3 mb-2">
+                  <User size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                  <p className="text-base font-semibold text-gray-900">{enc.prenom} {enc.nom}</p>
+                </div>
+                <div className="flex items-start gap-3 ml-7">
+                  <Mail size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-gray-700 break-all">{enc.email}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

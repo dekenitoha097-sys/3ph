@@ -467,8 +467,10 @@ export default function ParametersPage() {
                 </form>
             </div>
 
-            {/* Gestion du groupe */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            {user?.role === 'etudiant' && (
+              <>
+                {/* Gestion du groupe */}
+                <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Rejoindre un groupe</h2>
 
                 {groupError && (
@@ -485,7 +487,8 @@ export default function ParametersPage() {
                     </div>
                 )}
 
-                <form onSubmit={handleGroupSubmit} className="space-y-4">
+                
+                     <form onSubmit={handleGroupSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Code du groupe
@@ -513,7 +516,13 @@ export default function ParametersPage() {
                         {groupLoading ? 'Mise à jour...' : <><Save size={18} /> Rejoindre le groupe</>}
                     </button>
                 </form>
-            </div>
+               
+               
+                </div>
+              </>
+            )}
+            
         </div>
+
     );
 }

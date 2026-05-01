@@ -33,15 +33,12 @@ export async function GET(
         u_etudiant.nom as nom_etudiant,
         u_etudiant.prenom as prenom_etudiant,
         u_etudiant.email as email_etudiant,
-        u_encadrant.nom as nom_encadrant,
-        u_encadrant.prenom as prenom_encadrant,
         u_labo.nom as nom_laboratoire,
         u_labo.email as email_laboratoire
       FROM demande d
       LEFT JOIN status s ON d.id_status = s.id_status
       LEFT JOIN groupe g ON d.id_groupe = g.id_groupe
       LEFT JOIN utilisateur u_etudiant ON d.id_etudiant = u_etudiant.id_utilisateur
-      LEFT JOIN utilisateur u_encadrant ON d.id_encadrant = u_encadrant.id_utilisateur
       LEFT JOIN utilisateur u_labo ON d.id_laboratoire = u_labo.id_utilisateur
       WHERE d.id_demande = ?`,
       [id]
@@ -54,6 +51,21 @@ export async function GET(
     }
 
     const demandeInfo = demandesArray[0];
+
+    // Récupérer tous les encadrants assignés au groupe
+    const [encadrants] = await connection.execute(
+      `SELECT 
+        u.id_utilisateur,
+        u.nom,
+        u.prenom,
+        u.email
+      FROM encadrant_groupe eg
+      LEFT JOIN utilisateur u ON eg.id_encadrant = u.id_utilisateur
+      WHERE eg.id_groupe = ?`,
+      [demandeInfo.id_groupe]
+    );
+
+    const encadrantsArray = (encadrants as any[]) || [];
 
     // Récupérer les composants demandés
     const [lignes] = await connection.execute(
@@ -99,10 +111,12 @@ export async function GET(
           prenom: demandeInfo.prenom_etudiant,
           email: demandeInfo.email_etudiant,
         },
-        encadrant: demandeInfo.nom_encadrant ? {
-          nom: demandeInfo.nom_encadrant,
-          prenom: demandeInfo.prenom_encadrant,
-        } : null,
+        encadrants: encadrantsArray.map((enc: any) => ({
+          id_utilisateur: enc.id_utilisateur,
+          nom: enc.nom,
+          prenom: enc.prenom,
+          email: enc.email,
+        })),
         laboratoire: demandeInfo.nom_laboratoire ? {
           nom: demandeInfo.nom_laboratoire,
           email: demandeInfo.email_laboratoire,

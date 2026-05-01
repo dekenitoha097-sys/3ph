@@ -30,10 +30,12 @@ interface Demande {
     prenom: string;
     email: string;
   };
-  encadrant?: {
+  encadrants?: Array<{
+    id_utilisateur: number;
     nom: string;
     prenom: string;
-  } | null;
+    email: string;
+  }>;
   laboratoire?: {
     nom: string;
     email: string;
@@ -226,7 +228,7 @@ export default function DemandDetailPage() {
             <InfoGrid
               etudiant={demande.etudiant}
               groupe={demande.groupe}
-              encadrant={demande.encadrant}
+              encadrants={demande.encadrants}
               laboratoire={demande.laboratoire}
             />
 

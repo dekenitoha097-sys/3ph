@@ -73,6 +73,7 @@ export default function Sidebar() {
         lab: [
             { href: '/dashboard', label: 'Accueil', icon: Home },
             { href: '/dashboard/all-demands', label: 'Demandes', icon: FileText },
+            { href: '/dashboard/voir-demandes-encadrant', label: 'Voir Demandes Encadrant', icon: CheckCircle },
             { href: '/dashboard/composants', label: 'Composants', icon: Package },
 
         ],
@@ -128,9 +129,9 @@ export default function Sidebar() {
                 {/* Header Sidebar */}
                 <div className="p-6 border-b border-blue-700">
                     <div className="flex items-center justify-between mb-4">
-                        <img 
-                            src="https://candidature.hestim.ma/hestim_portal/static/description/img/hestim_white_logo.png" 
-                            alt="HESTIM" 
+                        <img
+                            src="https://candidature.hestim.ma/hestim_portal/static/description/img/hestim_white_logo.png"
+                            alt="HESTIM"
                             className="h-10 object-contain"
                         />
                         <button

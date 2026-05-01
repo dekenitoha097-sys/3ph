@@ -9,9 +9,11 @@ interface DecodedToken {
     email: string;
 }
 
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function GET(request: NextRequest) {
+    let connection;
     try {
         // Récupère le token
         const cookieStore = await cookies();
@@ -29,16 +31,17 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Token invalide ou expiré' }, { status: 401 });
         }
 
+        connection = await pool.getConnection();
+
         // Récupère les query parameters
         const searchParams = request.nextUrl.searchParams;
         const filiere = searchParams.get('filiere');
         const annee = searchParams.get('annee');
         const status = searchParams.get('status');
-        const code_groupe = searchParams.get('code_groupe');
         const search = searchParams.get('search');
-        const date_soumission = searchParams.get('date_soumission'); // Format: YYYY-MM-DD ou YYYY-MM ou YYYY
+        const date_soumission = searchParams.get('date_soumission');
 
-        // Récupère les demandes selon le rôle
+        // Construction de la query pour les demandes
         let query = `
             SELECT DISTINCT
                 d.id_demande,
@@ -60,88 +63,61 @@ export async function GET(request: NextRequest) {
             JOIN status s ON d.id_status = s.id_status
             JOIN groupe g ON d.id_groupe = g.id_groupe
             JOIN utilisateur u_etudiant ON d.id_etudiant = u_etudiant.id_utilisateur
-            JOIN encadrant_groupe eg ON g.id_groupe = eg.id_groupe
-            WHERE 1=1
-        `;
-
-        let params: any[] = [];
-
-        // Filtre par rôle
-        if (user.role === 'etudiant') {
-            query += ' AND d.id_etudiant = ?';
-            params.push(user.id);
-        } else if (user.role === 'encadrant') {
-            query += `
-                AND g.id_groupe IN (
+            WHERE (
+                d.id_laboratoire = ? 
+                OR g.id_groupe IN (
                     SELECT id_groupe 
                     FROM encadrant_groupe 
                     WHERE id_encadrant = ?
                 )
-            `;
-            params.push(user.id);
-        } else if (user.role === 'laboratoire') {
-            query += 'AND d.id_status IN (3,4,5)'; // Affiche les demandes validées ou en cours de validation
-        }
-        // admin voit toutes les demandes
+            )
+        `;
 
-        // Filtres supplémentaires
+        const params: any[] = [user.id, user.id];
+
+        // Applique les filtres
         if (filiere) {
-            query += ' AND g.filiere = ?';
+            query += ` AND g.filiere = ?`;
             params.push(filiere);
         }
 
         if (annee) {
-            query += ' AND g.annee = ?';
+            query += ` AND g.annee = ?`;
             params.push(annee);
         }
 
         if (status) {
-            query += ' AND s.libelle = ?';
+            query += ` AND s.libelle = ?`;
             params.push(status);
         }
 
-        if (code_groupe) {
-            query += ' AND g.code_groupe = ?';
-            params.push(code_groupe);
-        }
-
         if (search) {
-            query += ' AND (d.titre LIKE ? OR d.description LIKE ?)';
-            params.push(`%${search}%`, `%${search}%`);
+            query += ` AND (d.titre LIKE ? OR d.description LIKE ? OR u_etudiant.nom LIKE ? OR u_etudiant.prenom LIKE ?)`;
+            const searchTerm = `%${search}%`;
+            params.push(searchTerm, searchTerm, searchTerm, searchTerm);
         }
 
         if (date_soumission) {
-            // Supporte YYYY, YYYY-MM, YYYY-MM-DD
-            if (date_soumission.length === 4) {
-                // Année seulement
-                query += ' AND YEAR(d.date_soumission) = ?';
-                params.push(parseInt(date_soumission));
-            } else if (date_soumission.length === 7) {
-                // Année-Mois
-                query += ' AND DATE_FORMAT(d.date_soumission, "%Y-%m") = ?';
-                params.push(date_soumission);
-            } else {
-                // Date complète
-                query += ' AND DATE(d.date_soumission) = ?';
-                params.push(date_soumission);
-            }
+            query += ` AND DATE_FORMAT(d.date_soumission, '%Y-%m-%d') LIKE ?`;
+            params.push(`${date_soumission}%`);
         }
 
-        query += ' ORDER BY d.date_soumission DESC';
+        query += ` ORDER BY d.date_modification DESC`;
 
-        const [demandes]: any = await pool.query(query, params);
+        const [demandes] = await connection.execute(query, params);
 
-        return NextResponse.json({ demandes, count: demandes.length });
+        return NextResponse.json({ 
+            demandes: demandes || [], 
+            count: (demandes as any[]).length 
+        });
 
     } catch (error) {
-        console.error('Error fetching demands:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-        return NextResponse.json(
-            {
-                message: 'Erreur serveur',
-                error: errorMessage,
-            },
-            { status: 500 }
-        );
+        console.error('Erreur dans la route demandes-lab-encadrant:', error);
+        return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
     }
 }
+
