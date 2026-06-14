@@ -65,7 +65,7 @@ export default function ComposantCard({
         </div>
       )}
       {/* Image */}
-      <div className="w-full h-40 bg-gray-100 overflow-hidden">
+      <div className="w-full h-72 bg-gray-100 overflow-hidden">
         {image_url ? (
           <img
             src={image_url}

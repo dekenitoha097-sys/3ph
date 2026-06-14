@@ -268,27 +268,6 @@ export default function ComposantsPage() {
             ">
               Composants à commander
             </button>
-            <button 
-              onClick={async () => {
-                setLoadingCustom(true);
-                try {
-                  const response = await fetch('/api/composants/custom');
-                  if (response.ok) {
-                    const data = await response.json();
-                    setCustomComposants(data.composants || []);
-                  }
-                } catch (err) {
-                  console.error('Erreur:', err);
-                }
-                setLoadingCustom(false);
-                setIsCustomModalOpen(true);
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2
-             bg-orange-600 hover:bg-orange-700 text-white rounded-lg
-             transition-all duration-200 cursor-pointer
-            ">
-              Composants à commander
-            </button>
           </div>
         </div>
 

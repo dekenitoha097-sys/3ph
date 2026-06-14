@@ -157,7 +157,7 @@ export default function EditModal({ composant, isOpen, onClose, onSave }: EditMo
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {formData.photo_lien && (
-              <div className="mt-2 h-32 bg-gray-100 rounded-lg overflow-hidden">
+              <div className="mt-2 h-96 bg-gray-100 rounded-lg overflow-hidden">
                 <img
                   src={formData.photo_lien}
                   alt="Aperçu"
