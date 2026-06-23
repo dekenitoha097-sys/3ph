@@ -253,7 +253,7 @@ export default function LoginPage() {
 
                                 {/* Footer */}
                                 <div className="px-6 py-3 sm:px-8 bg-gray-50 border-t border-gray-100 text-center">
-                                    <p className="text-xs text-gray-500">© 2024 HESTIM</p>
+                                    <p className="text-xs text-gray-500">© 2026 HESTIM</p>
                                 </div>
                             </div>
                         </div>

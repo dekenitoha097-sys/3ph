@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Loader2,Plus } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import FilterBar from './components/FilterBar';
 import ComposantCard from './components/ComposantCard';
 import PaginationControls from './components/PaginationControls';
 import EditModal from './components/EditModal';
 import CreateComposantModal from './components/CreateComposantModal';
 import OrderComposantsModal from './components/OrderComposantsModal';
+import AllComposantsModal from './components/allComposantModal';
 
 interface Composant {
   id_composant: number;
@@ -41,6 +42,7 @@ interface PaginationInfo {
 
 export default function ComposantsPage() {
   const [composants, setComposants] = useState<Composant[]>([]);
+  const [allComponents, setAllComponents] = useState<Composant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationInfo>({
@@ -49,6 +51,7 @@ export default function ComposantsPage() {
     offset: 0,
     hasMore: false,
   });
+  const [isOpen, setIsOpen] = useState(false);
 
   // Filtres
   const [search, setSearch] = useState('');
@@ -160,7 +163,7 @@ export default function ComposantsPage() {
     try {
       setDeleting(true);
       setDeleteError(null);
-      
+
       const response = await fetch(`/api/composants/${deleteConfirm.id}`, {
         method: 'DELETE',
       });
@@ -219,14 +222,40 @@ export default function ComposantsPage() {
     // Composants disponibles d'abord
     if (a.statut_disponibilite === 'DIS' && b.statut_disponibilite !== 'DIS') return -1;
     if (a.statut_disponibilite !== 'DIS' && b.statut_disponibilite === 'DIS') return 1;
-    
+
     // Catalog avant custom
     if (a.existe && !b.existe) return -1;
     if (!a.existe && b.existe) return 1;
-    
+
     // Par stock décroissant
     return b.disponibilite - a.disponibilite;
   });
+
+  useEffect(() => {
+    async function getAllComponents() {
+      try {
+        const res = await fetch("/api/composants/all/components")
+        if (!res.ok) {
+          console.error('Failed to fetch components');
+          return
+        }
+
+        const data = await res.json();
+        // Assurer que data est un array
+        const componentsArray = Array.isArray(data)
+          ? data
+          : data && Array.isArray(data.composants)
+            ? data.composants
+            : [];
+        setAllComponents(componentsArray);
+      } catch (err) {
+        console.error('Error fetching all components:', err);
+        setAllComponents([]);
+      }
+    }
+
+    getAllComponents();
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -239,7 +268,7 @@ export default function ComposantsPage() {
           </p>
 
           <div className="flex gap-3 mt-4">
-            <button 
+            <button
               onClick={() => setIsCreateModalOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2
              bg-green-600 hover:bg-green-700 text-white rounded-lg
@@ -247,7 +276,7 @@ export default function ComposantsPage() {
             ">
               <Plus /> Ajouter un composant
             </button>
-            <button 
+            <button
               onClick={async () => {
                 setLoadingCustom(true);
                 try {
@@ -268,6 +297,21 @@ export default function ComposantsPage() {
             ">
               Composants à commander
             </button>
+
+            <button
+              className="inline-flex items-center gap-2 px-4 py-2
+  bg-blue-600 hover:bg-blue-700 text-white rounded-lg
+  transition-all duration-200 cursor-pointer"
+              onClick={() => setIsOpen(true)}
+            >
+              Liste de tous les composants
+            </button>
+
+            <AllComposantsModal
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              composants={allComponents}
+            />
           </div>
         </div>
 

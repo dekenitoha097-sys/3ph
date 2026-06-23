@@ -6,23 +6,23 @@ import {
     Package, Eye, Inbox, Loader, AlertCircle, AlertTriangle
 } from 'lucide-react';
 
-interface LaboratoireStats {
-    id_utilisateur: number;
-    total_demandes_traitees: number;
-    demandes_a_traiter: number;
-    demandes_completees: number;
-    demandes_transmis_admin: number;
-    demandes_alternative_proposee: number;
-    total_composants_demandes: number;
-    composants_disponibles: number;
-    composants_indisponibles: number;
-    composants_non_evalues: number;
-    taux_traitement_percent: number | string;
-    taux_disponibilite_percent: number | string;
-    progression_moyenne_demandes: number | string;
-    notifications_non_lues: number;
-    notifications_totales: number;
-}
+    interface LaboratoireStats {
+        id_utilisateur: number;
+        total_demandes_traitees: number;
+        demandes_a_traiter: number;
+        demandes_completees: number;
+        demandes_transmis_admin: number;
+        demandes_alternative_proposee: number;
+        total_composants_demandes: number;
+        composants_disponibles: number;
+        composants_indisponibles: number;
+        composants_non_evalues: number;
+        taux_traitement_percent: number | string;
+        taux_disponibilite_percent: number | string;
+        progression_moyenne_demandes: number | string;
+        notifications_non_lues: number;
+        notifications_totales: number;
+    }
 
 export default function LaboratoireDashboard() {
     const [stats, setStats] = useState<LaboratoireStats | null>(null);
