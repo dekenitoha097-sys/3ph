@@ -6,6 +6,7 @@ import AdminDashboard from './components/AdminDashboard';
 import EtudiantDashboard from './components/EtudiantDashboard';
 import EncadrantDashboard from './components/EncadrantDashboard';
 import LaboratoireDashboard from './components/LaboratoireDashboard';
+import AchatDashboard from './components/AchatDashboard';
 
 export default function DashboardPage() {
 
@@ -23,7 +24,7 @@ export default function DashboardPage() {
             {user?.role === 'etudiant' && <EtudiantDashboard />}
             {user?.role === 'encadrant' && <EncadrantDashboard />}
             {user?.role === 'laboratoire' && <LaboratoireDashboard />}
-            {user?.role === 'achat' && <></>}
+            {user?.role === 'achat' && <AchatDashboard />}
         </div>
     );
 }

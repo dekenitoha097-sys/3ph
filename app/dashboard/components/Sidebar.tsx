@@ -87,7 +87,9 @@ export default function Sidebar() {
         ],
         achat: [
             { href: '/dashboard', label: 'Accueil', icon: Home },
+            { href: '/dashboard/all-demands', label: 'Toutes Demandes', icon: FileText },
             { href: '/dashboard/composants', label: 'Composants', icon: Package },
+            
         ]
     } as const;
 

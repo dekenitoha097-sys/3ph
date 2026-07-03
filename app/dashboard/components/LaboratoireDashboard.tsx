@@ -200,7 +200,7 @@ export default function LaboratoireDashboard() {
 
 function Card({ title, value, icon, color }: any) {
     return (
-        <div className="bg-white border rounded-lg p-6 shadow-sm">
+        <div className="bg-white rounded-lg p-6 shadow-sm">
             <div className="flex justify-between items-center">
                 <div>
                     <p className="text-gray-500 text-sm">{title}</p>
