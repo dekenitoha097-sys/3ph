@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
-import { X, Printer, FileSpreadsheet } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { X, Printer, FileSpreadsheet, Filter } from 'lucide-react';
 import { exportToExcel, exportToPrint, generateReportHTML } from '../utils/exportUtils';
 
 interface Composant {
@@ -31,16 +31,46 @@ export default function AllComposantsModal({
   composants = [],
 }: ComposantsModalProps) {
   const reportRef = useRef<HTMLDivElement>(null);
+  const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'unavailable'>('all');
 
   // Sécuriser composants - s'assurer que c'est un array
   const safeComposants: Composant[] = Array.isArray(composants)
     ? composants
     : [];
 
-  const handleExportExcel = () => {
-    if (safeComposants.length === 0) return;
+  const isComposantDisponible = (composant: Composant) => {
+    const status = (composant.statut_disponibilite || '').toUpperCase();
 
-    const excelData = safeComposants.map((c: Composant) => ({
+    if (status === 'DIS') return true;
+    if (status === 'IND' || status === 'NON' || status === 'NON DISPONIBLE' || status === 'NON_DISPONIBLE') return false;
+
+    if (typeof composant.existe === 'boolean') {
+      return composant.existe;
+    }
+
+    if (typeof composant.existe === 'number') {
+      return composant.existe === 1;
+    }
+
+    return (composant.disponibilite || composant.quantite || 0) > 0;
+  };
+
+  const filteredComposants = useMemo(() => {
+    if (availabilityFilter === 'available') {
+      return safeComposants.filter(isComposantDisponible);
+    }
+
+    if (availabilityFilter === 'unavailable') {
+      return safeComposants.filter((composant) => !isComposantDisponible(composant));
+    }
+
+    return safeComposants;
+  }, [availabilityFilter, safeComposants]);
+
+  const handleExportExcel = () => {
+    if (filteredComposants.length === 0) return;
+
+    const excelData = filteredComposants.map((c: Composant) => ({
       'Nom': c.nom,
       'Référence': c.reference,
       'Quantité': c.disponibilite || c.quantite || '-',
@@ -49,7 +79,7 @@ export default function AllComposantsModal({
     }));
 
     exportToExcel(
-      safeComposants,
+      filteredComposants,
       'Liste_Composants',
       Object.keys(excelData[0] || {}).reduce((acc, key) => {
         acc[key.toLowerCase()] = key;
@@ -64,12 +94,12 @@ export default function AllComposantsModal({
     const stats = [
       {
         label: 'Total composants',
-        value: safeComposants.length,
+        value: filteredComposants.length,
         color: 'green' as const,
       },
       {
         label: 'Quantité totale',
-        value: safeComposants.reduce((sum: number, c: Composant) => sum + (c.disponibilite || c.quantite || 0), 0),
+        value: filteredComposants.reduce((sum: number, c: Composant) => sum + (c.disponibilite || c.quantite || 0), 0),
         color: 'orange' as const,
       },
     ];
@@ -87,7 +117,7 @@ export default function AllComposantsModal({
           </tr>
         </thead>
         <tbody>
-          ${safeComposants
+          ${filteredComposants
             .map(
               (c: Composant) => `
             <tr>
@@ -139,7 +169,7 @@ export default function AllComposantsModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 className="text-2xl font-bold text-gray-900">
-            Liste des composants ({safeComposants.length})
+            Liste des composants ({filteredComposants.length})
           </h3>
 
           <button
@@ -151,10 +181,28 @@ export default function AllComposantsModal({
         </div>
 
         {/* Barre d'actions */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-end gap-3">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <Filter size={16} className="text-blue-600" />
+            <label htmlFor="availability-filter" className="font-medium">
+              Filtrer avant export :
+            </label>
+            <select
+              id="availability-filter"
+              value={availabilityFilter}
+              onChange={(e) => setAvailabilityFilter(e.target.value as 'all' | 'available' | 'unavailable')}
+              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            >
+              <option value="all">Tous</option>
+              <option value="available">Disponibles</option>
+              <option value="unavailable">Non disponibles</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-3">
           <button
             onClick={handleExportExcel}
-            disabled={safeComposants.length === 0}
+            disabled={filteredComposants.length === 0}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4" />
@@ -163,23 +211,24 @@ export default function AllComposantsModal({
           
           <button
             onClick={handlePrint}
-            disabled={safeComposants.length === 0}
+            disabled={filteredComposants.length === 0}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             Imprimer
           </button>
+          </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
-          {safeComposants.length === 0 ? (
+          {filteredComposants.length === 0 ? (
             <p className="text-gray-500 text-center text-lg">
               Aucun composant disponible
             </p>
           ) : (
             <div ref={reportRef} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {safeComposants.map((c: Composant) => (
+              {filteredComposants.map((c: Composant) => (
                 <div
                   key={c.id_composant}
                   className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"

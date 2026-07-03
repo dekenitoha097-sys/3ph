@@ -160,9 +160,19 @@ export default function AllDemandsPage() {
           viewMode={viewMode}
         >
           {viewMode === 'table' ? (
-            <TableView demandes={demandes} getStatusColor={getStatusColor} formatDate={formatDate} />
+            <TableView
+              demandes={demandes}
+              getStatusColor={getStatusColor}
+              formatDate={formatDate}
+              viewFrom={userRole === 'laboratoire' ? 'laboratoire' : userRole === 'encadrant' ? 'encadrant' : undefined}
+            />
           ) : (
-            <KanbanView demandesByStatus={demandesByStatus} getStatusColor={getStatusColor} formatDate={formatDate} />
+            <KanbanView
+              demandesByStatus={demandesByStatus}
+              getStatusColor={getStatusColor}
+              formatDate={formatDate}
+              viewFrom={userRole === 'laboratoire' ? 'laboratoire' : userRole === 'encadrant' ? 'encadrant' : undefined}
+            />
           )}
         </ContentState>
 

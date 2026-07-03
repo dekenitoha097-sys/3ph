@@ -24,7 +24,7 @@ export default function Sidebar() {
     };
 
     // Mapper le rôle de la base de données au type attendu
-    const roleMap: Record<string, 'student' | 'supervisor' | 'lab' | 'admin'> = {
+    const roleMap: Record<string, 'student' | 'supervisor' | 'lab' | 'admin' | 'achat'> = {
         'Étudiant': 'student',
         'etudiant': 'student',
         'Encadrant': 'supervisor',
@@ -36,6 +36,8 @@ export default function Sidebar() {
         'ADMIN': 'admin',
         'Administrateur': 'admin',
         'administrateur': 'admin',
+        'Achat' : 'achat',
+        'achat' : 'achat',
     };
 
     // Debug: Log le rôle reçu
@@ -54,7 +56,7 @@ export default function Sidebar() {
         return 'Mr';
     };
 
-    const userRole: 'student' | 'supervisor' | 'lab' | 'admin' = (user?.role && roleMap[user.role]) || 'student';
+    const userRole: 'student' | 'supervisor' | 'lab' | 'admin' | 'achat' = (user?.role && roleMap[user.role]) || 'student';
     const userTitle = user?.sexe ? getTitleBySex(user.sexe) : '';
     const userName = user ? `${userTitle} ${user.prenom} ${user.nom}` : 'Utilisateur';
 
@@ -83,6 +85,10 @@ export default function Sidebar() {
             { href: '/dashboard/utilisateur', label: 'Utilisateurs', icon: Users },
             { href: '/dashboard/gestion-des-affectations', label: 'Gestion des Affectations', icon: BarChart3 },
         ],
+        achat: [
+            { href: '/dashboard', label: 'Accueil', icon: Home },
+            { href: '/dashboard/composants', label: 'Composants', icon: Package },
+        ]
     } as const;
 
     const menuItems = menuConfig[userRole];
@@ -93,6 +99,7 @@ export default function Sidebar() {
         supervisor: 'Encadrant',
         lab: 'Laboratoire',
         admin: 'Administrateur',
+        achat: 'achat',
     }[userRole];
 
     if (loading) {

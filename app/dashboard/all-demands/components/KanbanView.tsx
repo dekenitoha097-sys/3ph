@@ -25,6 +25,7 @@ interface KanbanViewProps {
   demandesByStatus: Record<string, Demande[]>;
   getStatusColor: (status: string) => { bg: string; text: string; badge: string };
   formatDate: (date: string) => string;
+  viewFrom?: 'encadrant' | 'laboratoire';
 }
 
 const STATUS_ORDER = [
@@ -50,12 +51,14 @@ export default function KanbanView({
   demandesByStatus,
   getStatusColor,
   formatDate,
+  viewFrom,
 }: KanbanViewProps) {
   const router = useRouter();
 
-
   const handleDemandClick = (id: number) => {
-    router.push(`/dashboard/all-demands/${id}`);
+    const baseUrl = `/dashboard/all-demands/${id}`;
+    const url = viewFrom ? `${baseUrl}?view=${viewFrom}` : baseUrl;
+    router.push(url);
   };
 
   // Trier les colonnes dans l'ordre correct

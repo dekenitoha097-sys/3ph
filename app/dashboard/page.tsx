@@ -23,6 +23,7 @@ export default function DashboardPage() {
             {user?.role === 'etudiant' && <EtudiantDashboard />}
             {user?.role === 'encadrant' && <EncadrantDashboard />}
             {user?.role === 'laboratoire' && <LaboratoireDashboard />}
+            {user?.role === 'achat' && <></>}
         </div>
     );
 }

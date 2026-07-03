@@ -7,6 +7,7 @@ import ViewModeSelector from '../all-demands/components/ViewModeSelector';
 import TableView from '../all-demands/components/TableView';
 import KanbanView from '../all-demands/components/KanbanView';
 import ContentState from '../all-demands/components/ContentState';
+import DiscussionPanel from '../all-demands/[id]/components/DiscussionPanel';
 
 interface Demande {
   id_demande: number;
@@ -148,9 +149,19 @@ export default function VoirDemandesEncadrantPage() {
           viewMode={viewMode}
         >
           {viewMode === 'table' ? (
-            <TableView demandes={demandes} getStatusColor={getStatusColor} formatDate={formatDate} />
+            <TableView
+              demandes={demandes}
+              getStatusColor={getStatusColor}
+              formatDate={formatDate}
+              viewFrom="encadrant"
+            />
           ) : (
-            <KanbanView demandesByStatus={demandesByStatus} getStatusColor={getStatusColor} formatDate={formatDate} />
+            <KanbanView
+              demandesByStatus={demandesByStatus}
+              getStatusColor={getStatusColor}
+              formatDate={formatDate}
+              viewFrom="encadrant"
+            />
           )}
         </ContentState>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus , ShoppingCart, List} from 'lucide-react';
 import FilterBar from './components/FilterBar';
 import ComposantCard from './components/ComposantCard';
 import PaginationControls from './components/PaginationControls';
@@ -295,6 +295,7 @@ export default function ComposantsPage() {
              bg-orange-600 hover:bg-orange-700 text-white rounded-lg
              transition-all duration-200 cursor-pointer
             ">
+              <ShoppingCart size={18} />
               Composants à commander
             </button>
 
@@ -304,6 +305,7 @@ export default function ComposantsPage() {
   transition-all duration-200 cursor-pointer"
               onClick={() => setIsOpen(true)}
             >
+               <List size={18} />
               Liste de tous les composants
             </button>
 

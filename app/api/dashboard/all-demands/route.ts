@@ -60,7 +60,6 @@ export async function GET(request: NextRequest) {
             JOIN status s ON d.id_status = s.id_status
             JOIN groupe g ON d.id_groupe = g.id_groupe
             JOIN utilisateur u_etudiant ON d.id_etudiant = u_etudiant.id_utilisateur
-            JOIN encadrant_groupe eg ON g.id_groupe = eg.id_groupe
             WHERE 1=1
         `;
 
@@ -80,7 +79,18 @@ export async function GET(request: NextRequest) {
             `;
             params.push(user.id);
         } else if (user.role === 'laboratoire') {
-            query += 'AND d.id_status IN (3,4,5)'; // Affiche les demandes validées ou en cours de validation
+            // Vérifier si l'utilisateur est aussi encadrant
+            query += `
+                AND (
+                    d.id_status IN (3,4,5)
+                    OR g.id_groupe IN (
+                        SELECT id_groupe 
+                        FROM encadrant_groupe 
+                        WHERE id_encadrant = ?
+                    )
+                )
+            `;
+            params.push(user.id);
         }
         // admin voit toutes les demandes
 

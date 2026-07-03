@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Edit2 } from 'lucide-react';
 import { useSession } from '@/hooks/useSession';
 import HeaderInfo from './components/HeaderInfo';
@@ -59,6 +59,7 @@ interface Demande {
 export default function DemandDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params.id as string;
   const { user } = useSession();
 
@@ -66,6 +67,13 @@ export default function DemandDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+
+  const isEncadrant = user?.role === 'encadrant' || demande?.encadrants?.some(enc => enc.id_utilisateur === user?.id);
+  const isLaboratoire = user?.role === 'laboratoire';
+  const viewMode = searchParams?.get('view') as 'encadrant' | 'laboratoire' | null;
+  const showEncadrantActions = viewMode === 'encadrant' ? isEncadrant : viewMode === 'laboratoire' ? false : isEncadrant;
+  const showLaboratoireActions = viewMode === 'laboratoire' ? isLaboratoire : viewMode === 'encadrant' ? false : isLaboratoire;
+  const showDiscussion = viewMode === 'laboratoire' ? false : user?.role === 'etudiant' || isEncadrant;
 
   useEffect(() => {
     if (!id) return;
@@ -91,6 +99,16 @@ export default function DemandDetailPage() {
 
     fetchDemande();
   }, [id]);
+
+  useEffect(() => {
+    if (!message) return;
+
+    const timeout = setTimeout(() => {
+      setMessage('');
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [message]);
 
   async function handleUpdateDemande(id_st: number, progression: number) {
     try {
@@ -122,10 +140,6 @@ export default function DemandDetailPage() {
       console.error('Erreur lors de la mise à jour de la demande:', error);
     }
   }
-
-  setTimeout(() => {
-    setMessage('');
-  }, 5000);
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 md:p-8">
@@ -162,7 +176,7 @@ export default function DemandDetailPage() {
               </span>
             )}
             {
-              user?.role == "encadrant" && (
+              showEncadrantActions && (
                 <div>
                   <button
                     onClick={() => handleUpdateDemande(3, 50)}
@@ -175,14 +189,12 @@ export default function DemandDetailPage() {
                     className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 ease-in-out"
                   >
                     Rejeter la demande
-
                   </button>
                 </div>
-
               )
             }
             {
-              user?.role == "laboratoire" && (
+              showLaboratoireActions && (
                 <div>
                   <button
                     onClick={() => handleUpdateDemande(4, 75)}
@@ -195,11 +207,9 @@ export default function DemandDetailPage() {
                     className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 ease-in-out"
                   >
                     Recuperer
-
                   </button>
                 </div>
               )
-
             }
 
           </div>
@@ -244,8 +254,8 @@ export default function DemandDetailPage() {
       </div>
 
       {/* Discussion Panel - Uniquement pour étudiant et encadrant */}
-      {user?.role && (user.role === 'etudiant' || user.role === 'encadrant') && (
-        <DiscussionPanel id_demande={parseInt(id)} userRole={user.role} />
+      {showDiscussion && (
+        <DiscussionPanel id_demande={parseInt(id)} userRole={user?.role ?? 'encadrant'} />
       )}
     </div>
   );

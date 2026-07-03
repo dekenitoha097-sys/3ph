@@ -19,7 +19,7 @@ export async function GET() {
 
         // Récupérer les données mises à jour de la base de données
         const [rows]: any = await pool.query(
-            'SELECT id_utilisateur, id_groupe FROM utilisateur WHERE id_utilisateur = ?',
+            'SELECT id_utilisateur, id_groupe, role FROM utilisateur WHERE id_utilisateur = ?',
             [decoded.id]
         );
 
@@ -35,7 +35,8 @@ export async function GET() {
         // Combiner les données du token avec les données de la base de données
         const user = {
             ...decoded,
-            id_groupe: userData.id_groupe
+            id_groupe: userData.id_groupe,
+            role: userData.role
         };
 
         return new Response(
