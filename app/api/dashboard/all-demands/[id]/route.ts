@@ -26,6 +26,7 @@ export async function GET(
         d.date_modification,
         s.libelle as status,
         d.id_groupe,
+        u_etudiant.id_utilisateur as id_etudiant,
         g.code_groupe,
         g.nom as nom_groupe,
         g.filiere,
@@ -107,6 +108,7 @@ export async function GET(
           annee: demandeInfo.annee,
         },
         etudiant: {
+          id_etudiant: demandeInfo.id_etudiant,
           nom: demandeInfo.nom_etudiant,
           prenom: demandeInfo.prenom_etudiant,
           email: demandeInfo.email_etudiant,

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Menu, X, Home, FileText, Users, BarChart3, Settings, LogOut, ShoppingCart, CheckCircle, Package, LayoutDashboard } from 'lucide-react';
+import { Menu,PackageCheck, X, Home, FileText, Users, BarChart3, Settings, LogOut, ShoppingCart, CheckCircle, Package, LayoutDashboard } from 'lucide-react';
 import { useSession } from '@/hooks/useSession';
 
 export default function Sidebar() {
@@ -66,7 +66,6 @@ export default function Sidebar() {
             { href: '/dashboard', label: 'Accueil', icon: Home },
             { href: '/dashboard/all-demands', label: 'Mes Demandes', icon: FileText },
             { href: '/dashboard/nouvelle-demande', label: 'Nouvelle Demande', icon: ShoppingCart },
-            { href: '/dashboard/history', label: 'Historique', icon: LayoutDashboard },
         ],
         supervisor: [
             { href: '/dashboard', label: 'Accueil', icon: Home },
@@ -76,6 +75,7 @@ export default function Sidebar() {
             { href: '/dashboard', label: 'Accueil', icon: Home },
             { href: '/dashboard/all-demands', label: 'Demandes', icon: FileText },
             { href: '/dashboard/voir-demandes-encadrant', label: 'Voir Demandes Encadrant', icon: CheckCircle },
+            { href: '/dashboard/recuperation_composant', label: 'Composants récupérés.', icon: PackageCheck },
             { href: '/dashboard/composants', label: 'Composants', icon: Package },
 
         ],

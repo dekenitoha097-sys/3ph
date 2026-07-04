@@ -1,32 +1,44 @@
 import { pool } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-
 export async function POST(request: Request) {
-    try {
-        const { id_demande, id_status, progression } = await request.json() as { id_demande: number, id_status: number, progression: number };
+  try {
+    const body = (await request.json()) as {
+      id_demande?: number | string;
+      id_status?: number | string;
+      progression?: number | string;
+    };
 
-        if (!id_status || typeof id_status !== 'number') {
-            return NextResponse.json(
-                { message: 'L\'ID du statut est requis' },
-                { status: 400 }
-            );
-        }
+    const idDemande = Number(body.id_demande);
+    const idStatus = Number(body.id_status);
+    const progression = Number(body.progression);
 
-        await pool.query("UPDATE demande SET id_status = ? WHERE id_demande = ?", [id_status, id_demande]);
-        await pool.query("UPDATE demande SET progression = ? WHERE id_demande = ?", [progression, id_demande]);
-
-        return NextResponse.json(
-            { message: 'Demande mise à jour avec succès' },
-            { status: 200 }
-        );
-
-
-
-    } catch (error) {
-        return NextResponse.json(
-            { message: "Erreur lors de la mise à jour de la demande" },
-            { status: 500 }
-        );
+    if (!Number.isInteger(idDemande) || idDemande <= 0) {
+      return NextResponse.json({ message: 'L\'ID de la demande est requis' }, { status: 400 });
     }
+
+    if (!Number.isInteger(idStatus) || idStatus <= 0) {
+      return NextResponse.json({ message: 'L\'ID du statut est requis' }, { status: 400 });
+    }
+
+    if (!Number.isFinite(progression) || progression < 0 || progression > 100) {
+      return NextResponse.json({ message: 'La progression doit être comprise entre 0 et 100' }, { status: 400 });
+    }
+
+    await pool.query(
+      'UPDATE demande SET id_status = ?, progression = ?, date_modification = NOW() WHERE id_demande = ?',
+      [idStatus, progression, idDemande]
+    );
+
+    return NextResponse.json(
+      { message: 'Demande mise à jour avec succès', progression, id_status: idStatus },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de la demande:', error);
+    return NextResponse.json(
+      { message: 'Erreur lors de la mise à jour de la demande' },
+      { status: 500 }
+    );
+  }
 }
