@@ -6,23 +6,23 @@ import {
     Package, Eye, Inbox, Loader, AlertCircle, AlertTriangle
 } from 'lucide-react';
 
-    interface LaboratoireStats {
-        id_utilisateur: number;
-        total_demandes_traitees: number;
-        demandes_a_traiter: number;
-        demandes_completees: number;
-        demandes_transmis_admin: number;
-        demandes_alternative_proposee: number;
-        total_composants_demandes: number;
-        composants_disponibles: number;
-        composants_indisponibles: number;
-        composants_non_evalues: number;
-        taux_traitement_percent: number | string;
-        taux_disponibilite_percent: number | string;
-        progression_moyenne_demandes: number | string;
-        notifications_non_lues: number;
-        notifications_totales: number;
-    }
+interface LaboratoireStats {
+    id_utilisateur: number;
+    total_demandes_traitees: number;
+    demandes_a_traiter: number;
+    demandes_completees: number;
+    demandes_transmis_admin: number;
+    demandes_alternative_proposee: number;
+    total_composants_demandes: number;
+    composants_disponibles: number;
+    composants_indisponibles: number;
+    composants_non_evalues: number;
+    taux_traitement_percent: number | string;
+    taux_disponibilite_percent: number | string;
+    progression_moyenne_demandes: number | string;
+    notifications_non_lues: number;
+    notifications_totales: number;
+}
 
 export default function LaboratoireDashboard() {
     const [stats, setStats] = useState<LaboratoireStats | null>(null);
@@ -67,7 +67,7 @@ export default function LaboratoireDashboard() {
 
     if (error) {
         return (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+            <div className="bg-red-50 rounded-lg shadow-sm p-4 flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
                     <p className="font-semibold text-red-900">Erreur</p>
@@ -123,7 +123,7 @@ export default function LaboratoireDashboard() {
             </div>
 
             {/* STATUT */}
-            <div className="bg-white rounded-lg border p-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                     <Eye className="w-5 h-5 text-blue-600" />
                     Statuts
@@ -137,7 +137,7 @@ export default function LaboratoireDashboard() {
             </div>
 
             {/* COMPOSANTS */}
-            <div className="bg-white rounded-lg border p-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                     <Package className="w-5 h-5 text-indigo-600" />
                     Composants
@@ -154,7 +154,7 @@ export default function LaboratoireDashboard() {
             </div>
 
             {/* PROGRESSION */}
-            <div className="bg-white rounded-lg border p-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-cyan-600" />
                     Progression
@@ -175,7 +175,7 @@ export default function LaboratoireDashboard() {
             </div>
 
             {/* NOTIFICATIONS */}
-            <div className="bg-white rounded-lg border p-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                     <Inbox className="w-5 h-5 text-purple-600" />
                     Notifications
@@ -214,7 +214,7 @@ function Card({ title, value, icon, color }: any) {
 
 function MiniStat({ label, value, color = "text-gray-900" }: any) {
     return (
-        <div className="bg-gray-50 border rounded-lg p-3">
+        <div className="bg-white rounded-lg p-3 shadow-sm">
             <p className="text-xs text-gray-500">{label}</p>
             <p className={`text-lg font-bold ${color}`}>{value}</p>
         </div>
