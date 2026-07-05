@@ -65,8 +65,11 @@ export default function DemandDetailPage() {
 
   const [demande, setDemande] = useState<Demande | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // États pour les messages
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [actionError, setActionError] = useState(''); // Nouvel état pour les erreurs d'action (ex: stock insuffisant)
   
   // État dynamique pour gérer quelle action nécessite une confirmation
   const [actionToConfirm, setActionToConfirm] = useState<'disponible' | 'recuperer' | null>(null);
@@ -78,9 +81,12 @@ export default function DemandDetailPage() {
   const showLaboratoireActions = viewMode === 'laboratoire' ? isLaboratoire : viewMode === 'encadrant' ? false : isLaboratoire;
   const showDiscussion = viewMode === 'laboratoire' ? false : user?.role === 'etudiant' || isEncadrant;
 
-  // NOUVEAU : Conditions d'activation des boutons basées sur les statuts de MySQL
+  // Conditions d'activation des boutons basées sur les statuts
   const isDisponibleDisabled = demande?.status === 'pret' || demande?.status === 'recupere';
   const isRecupererDisabled = demande?.status !== 'pret';
+  
+  // NOUVEAU : Désactiver "Valider" et "Rejeter" si la demande a déjà été traitée par l'encadrant
+  const isValidationDisabled = demande?.status === 'valide' || demande?.status === 'rejete' || demande?.status === 'pret' || demande?.status === 'recupere';
 
   useEffect(() => {
     if (!id) return;
@@ -107,15 +113,19 @@ export default function DemandDetailPage() {
     fetchDemande();
   }, [id]);
 
+  // Effet pour effacer les messages de succès
   useEffect(() => {
     if (!message) return;
-
-    const timeout = setTimeout(() => {
-      setMessage('');
-    }, 5000);
-
+    const timeout = setTimeout(() => setMessage(''), 5000);
     return () => clearTimeout(timeout);
   }, [message]);
+
+  // Effet pour effacer les messages d'erreur d'action (comme les stocks)
+  useEffect(() => {
+    if (!actionError) return;
+    const timeout = setTimeout(() => setActionError(''), 7000);
+    return () => clearTimeout(timeout);
+  }, [actionError]);
 
   async function handleUpdateDemande(id_st: number, progression: number) {
     try {
@@ -123,11 +133,11 @@ export default function DemandDetailPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_demande: id, id_status: id_st, progression: progression }),
-
       });
+      
       if (!response.ok) {
         const errorData = await response.json();
-        setMessage('Erreur lors de la mise à jour de la demande');
+        setActionError('Erreur lors de la mise à jour de la demande');
         throw new Error(errorData.message || 'Erreur lors de la mise à jour de la demande');
       }
 
@@ -148,9 +158,29 @@ export default function DemandDetailPage() {
     }
   }
 
+  // NOUVEAU : Fonction pour vérifier le stock avant d'ouvrir la modale de récupération
+  const handleRecupererClick = () => {
+    if (demande && demande.composants) {
+      // Cherche s'il y a un composant dont la quantité demandée dépasse le stock
+      const composantEnRupture = demande.composants.find(
+        (comp) => comp.quantite_demandee > comp.quantite_stock
+      );
+
+      if (composantEnRupture) {
+        // Affiche une erreur et bloque la suite
+        setActionError(`Impossible de récupérer : la quantité demandée pour "${composantEnRupture.nom}" (${composantEnRupture.quantite_demandee}) dépasse le stock disponible (${composantEnRupture.quantite_stock}).`);
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Remonte pour voir le message
+        return;
+      }
+    }
+    
+    // Si tout est OK, on ouvre la modale de confirmation
+    setActionToConfirm('recuperer');
+  };
+
   async function handleRecupererComposant() {
     if (!demande?.groupe?.id_groupe) {
-      setMessage('Impossible de récupérer : groupe manquant.');
+      setActionError('Impossible de récupérer : groupe manquant.');
       return;
     }
 
@@ -173,8 +203,7 @@ export default function DemandDetailPage() {
 
       if (!creationResponse.ok) {
         const fallbackMessage = creationData.message || 'Erreur lors de la récupération du composant';
-        setMessage(fallbackMessage);
-        setError(fallbackMessage);
+        setActionError(fallbackMessage);
         return;
       }
 
@@ -188,29 +217,34 @@ export default function DemandDetailPage() {
 
       if (!stockResponse.ok) {
         const fallbackMessage = stockData.error || 'Erreur lors de la mise à jour des stocks';
-        setMessage(fallbackMessage);
-        setError(fallbackMessage);
+        setActionError(fallbackMessage);
         return;
       }
 
       setMessage(creationData.message || 'Composant récupéré avec succès');
-      setError('');
+      setActionError('');
     } catch (error) {
       console.error('Erreur lors de la récupération du composant:', error);
-      setMessage('Erreur réseau lors de la récupération du composant');
-      setError('Erreur réseau lors de la récupération du composant');
+      setActionError('Erreur réseau lors de la récupération du composant');
     }
   }
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 md:p-8 relative">
-      {
-        message && (
-          <div className="mb-4 bg-green-50 border-2 border-green-200 rounded-lg p-4 md:p-6 text-green-700 text-base md:text-lg">
-            {message}
-          </div>
-        )
-      }
+      
+      {/* Alertes (Succès et Erreurs non-bloquantes) */}
+      {message && (
+        <div className="mb-4 bg-green-50 border-2 border-green-200 rounded-lg p-4 md:p-6 text-green-700 text-base md:text-lg">
+          {message}
+        </div>
+      )}
+      
+      {actionError && (
+        <div className="mb-4 bg-red-50 border-2 border-red-200 rounded-lg p-4 md:p-6 text-red-700 text-base md:text-lg">
+          {actionError}
+        </div>
+      )}
+
       <div className="w-full">
         {/* Header with back button */}
         <div className="mb-8 flex items-center justify-between">
@@ -222,7 +256,7 @@ export default function DemandDetailPage() {
             Retour
           </button>
           <div className="flex gap-2">
-            {user?.role === 'etudiant' && demande?.status !== 'valide' && demande?.status !== 'pret' && demande?.status !== 'recupere' && (
+            {user?.role === 'etudiant' && !isValidationDisabled && (
               <button
                 onClick={() => router.push(`/dashboard/all-demands/${id}/edit`)}
                 className="inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-blue-700 font-medium text-sm hover:text-blue-900 hover:bg-blue-200 rounded-lg transition-all duration-200 ease-in-out"
@@ -231,59 +265,65 @@ export default function DemandDetailPage() {
                 Modifier
               </button>
             )}
-            {user?.role === 'etudiant' && (demande?.status === 'valide' || demande?.status === 'pret' || demande?.status === 'recupere') && (
+            {user?.role === 'etudiant' && isValidationDisabled && (
               <span className="inline-flex items-center gap-2 px-4 py-2.5 text-gray-600 font-medium text-sm bg-gray-200 rounded-lg cursor-not-allowed">
                 Ne peut plus être modifiée
               </span>
             )}
-            {
-              showEncadrantActions && (
-                <div>
-                  <button
-                    onClick={() => handleUpdateDemande(3, 50)}
-                    className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 ease-in-out"
-                  >
-                    Valider la demande
-                  </button>
-                  <button
-                    onClick={() => handleUpdateDemande(2, 25)}
-                    className="ml-4 inline-flex cursor-pointer items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 ease-in-out"
-                  >
-                    Rejeter la demande
-                  </button>
-                </div>
-              )
-            }
-            {
-              showLaboratoireActions && (
-                <div>
-                  <button
-                    // MODIFIÉ : Ajout du paramètre HTML disabled et style conditionnel
-                    disabled={isDisponibleDisabled}
-                    onClick={() => setActionToConfirm('disponible')}
-                    className={`ml-4 inline-flex items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-green-600 rounded-lg transition-all duration-200 ease-in-out ${
-                      isDisponibleDisabled 
-                        ? 'opacity-50 cursor-not-allowed' 
-                        : 'cursor-pointer hover:bg-green-700'
-                    }`}
-                  >
-                    Marquer comme disponible
-                  </button>
-                  <button
-                    // MODIFIÉ : Ajout du paramètre HTML disabled et style conditionnel
-                    disabled={isRecupererDisabled}
-                    onClick={() => setActionToConfirm('recuperer')}
-                    className={`ml-4 inline-flex items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 rounded-lg transition-all duration-200 ease-in-out ${
-                      isRecupererDisabled 
-                        ? 'opacity-50 cursor-not-allowed' 
-                        : 'cursor-pointer hover:bg-red-700'
-                    }`}
-                  >
-                    Recuperer
-                  </button>
-                </div>
-              )
-            }
+            
+            {showEncadrantActions && (
+              <div>
+                <button
+                  disabled={isValidationDisabled}
+                  onClick={() => handleUpdateDemande(3, 50)}
+                  className={`ml-4 inline-flex items-center gap-2 px-4 py-2.5 text-white font-medium text-sm rounded-lg transition-all duration-200 ease-in-out ${
+                    isValidationDisabled 
+                      ? 'opacity-50 cursor-not-allowed bg-green-600' 
+                      : 'cursor-pointer bg-green-600 hover:bg-green-700'
+                  }`}
+                >
+                  Valider la demande
+                </button>
+                <button
+                  disabled={isValidationDisabled}
+                  onClick={() => handleUpdateDemande(2, 25)}
+                  className={`ml-4 inline-flex items-center gap-2 px-4 py-2.5 text-white font-medium text-sm rounded-lg transition-all duration-200 ease-in-out ${
+                    isValidationDisabled 
+                      ? 'opacity-50 cursor-not-allowed bg-red-600' 
+                      : 'cursor-pointer bg-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  Rejeter la demande
+                </button>
+              </div>
+            )}
+            
+            {showLaboratoireActions && (
+              <div>
+                <button
+                  disabled={isDisponibleDisabled}
+                  onClick={() => setActionToConfirm('disponible')}
+                  className={`ml-4 inline-flex items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-green-600 rounded-lg transition-all duration-200 ease-in-out ${
+                    isDisponibleDisabled 
+                      ? 'opacity-50 cursor-not-allowed' 
+                      : 'cursor-pointer hover:bg-green-700'
+                  }`}
+                >
+                  Marquer comme disponible
+                </button>
+                <button
+                  disabled={isRecupererDisabled}
+                  onClick={handleRecupererClick} // NOUVEAU : Appel de la fonction de vérification
+                  className={`ml-4 inline-flex items-center gap-2 px-4 py-2.5 text-white font-medium text-sm bg-red-600 rounded-lg transition-all duration-200 ease-in-out ${
+                    isRecupererDisabled 
+                      ? 'opacity-50 cursor-not-allowed' 
+                      : 'cursor-pointer hover:bg-red-700'
+                  }`}
+                >
+                  Recuperer
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
