@@ -60,7 +60,7 @@ export default function NouvelleDemandePage() {
     const fetchComposants = async () => {
       try {
         setLoading(true);
-        const res = await fetch('/api/composants');
+        const res = await fetch('/api/composants?type=3PH');
         const data = await res.json();
         setComposants(data.composants || []);
       } catch (err) {

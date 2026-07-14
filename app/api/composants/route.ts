@@ -1,8 +1,12 @@
 import { pool } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const url = new URL(request.url);
+        const type = url.searchParams.get('type')?.trim() || '';
+        const typeCondition = (type === 'LABO' || type === '3PH') ? `AND c.type = '${type}'` : '';
+
         const [composants] = await pool.query(`
     SELECT
         c.id_composant,
@@ -15,7 +19,7 @@ export async function GET() {
         c.Statut_Disponibilite AS statut_disponibilite,
         c.type,
         c.created_at
-    FROM composant c WHERE existe = 1
+    FROM composant c WHERE existe = 1 ${typeCondition}
 `);
         return NextResponse.json({ composants });
 
