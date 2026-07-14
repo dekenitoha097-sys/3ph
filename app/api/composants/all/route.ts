@@ -12,6 +12,7 @@ export async function GET(request: Request) {
         const minQuantite = searchParams.get('minQuantite');
         const maxQuantite = searchParams.get('maxQuantite');
         const existe = searchParams.get('existe'); // true, false
+        const type = searchParams.get('type'); // LABO, 3PH
         const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500);
         const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0);
 
@@ -51,6 +52,12 @@ export async function GET(request: Request) {
             params.push(existValue);
         }
 
+        // Filtre type (LABO, 3PH)
+        if (type === 'LABO' || type === '3PH') {
+            whereConditions.push(`c.type = ?`);
+            params.push(type);
+        }
+
         const whereClause = whereConditions.length > 0 
             ? `WHERE ${whereConditions.join(' AND ')}`
             : '';
@@ -73,6 +80,7 @@ export async function GET(request: Request) {
                 c.quantite AS disponibilite,
                 c.commentaire AS description,
                 c.Statut_Disponibilite AS statut_disponibilite,
+                c.type,
                 c.created_at
             FROM composant c 
             ${whereClause}

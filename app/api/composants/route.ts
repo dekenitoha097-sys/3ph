@@ -13,6 +13,7 @@ export async function GET() {
         c.quantite AS disponibilite,
         c.commentaire AS description,
         c.Statut_Disponibilite AS statut_disponibilite,
+        c.type,
         c.created_at
     FROM composant c WHERE existe = 1
 `);
@@ -31,7 +32,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { nom, reference, photo_lien, quantite, commentaire } = body;
+        const { nom, reference, photo_lien, quantite, commentaire, type } = body;
         if (!nom || !reference || quantite === undefined) {
             return NextResponse.json(
                 { error: 'Données manquantes: nom, reference et quantite sont requis' },
@@ -39,10 +40,12 @@ export async function POST(request: Request) {
             );
         }
 
+        const typeValue = ['LABO', '3PH'].includes(type) ? type : 'LABO';
+
         const [result] = await pool.query(
-            `INSERT INTO composant (nom, reference, photo_lien, quantite, commentaire, created_at)
-             VALUES (?, ?, ?, ?, ?, NOW())`,
-            [nom, reference, photo_lien || null, quantite, commentaire || null]
+            `INSERT INTO composant (nom, reference, photo_lien, quantite, commentaire, type, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+            [nom, reference, photo_lien || null, quantite, commentaire || null, typeValue]
         );
         const id_composant = (result as any).insertId;
 

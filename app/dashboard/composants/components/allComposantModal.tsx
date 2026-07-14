@@ -17,6 +17,7 @@ interface Composant {
   created_at?: string;
   existe?: 0 | 1 | boolean;
   statut_disponibilite: string;
+  type?: 'LABO' | '3PH';
 }
 
 interface ComposantsModalProps {
@@ -73,6 +74,7 @@ export default function AllComposantsModal({
     const excelData = filteredComposants.map((c: Composant) => ({
       'Nom': c.nom,
       'Référence': c.reference,
+      'Type': c.type || '-',
       'Quantité': c.disponibilite || c.quantite || '-',
       'Description': c.description || c.commentaire || '-',
       'Statut': c.statut_disponibilite || '-',
@@ -107,14 +109,15 @@ export default function AllComposantsModal({
     const tableHTML = `
       <table>
         <thead>
-          <tr>
-            <th style="width: 80px; text-align: center;">Aperçu</th>
-            <th>Nom</th>
-            <th>Référence</th>
-            <th style="width: 100px; text-align: center;">Quantité</th>
-            <th>Description</th>
-            <th style="width: 100px; text-align: center;">Statut</th>
-          </tr>
+            <tr>
+              <th style="width: 80px; text-align: center;">Aperçu</th>
+              <th>Nom</th>
+              <th>Référence</th>
+              <th style="width: 100px; text-align: center;">Type</th>
+              <th style="width: 100px; text-align: center;">Quantité</th>
+              <th>Description</th>
+              <th style="width: 100px; text-align: center;">Statut</th>
+            </tr>
         </thead>
         <tbody>
           ${filteredComposants
@@ -130,6 +133,7 @@ export default function AllComposantsModal({
               </td>
               <td style="font-weight: 600;">${c.nom}</td>
               <td style="font-family: monospace; font-size: 0.85rem;">${c.reference}</td>
+              <td style="text-align: center; font-weight: 600; color: #0f766e;">${c.type || '-'}</td>
               <td style="text-align: center; font-weight: bold; color: #16a34a;">${c.disponibilite || c.quantite || '-'}</td>
               <td>${c.description || c.commentaire || '-'}</td>
               <td style="text-align: center;">
@@ -249,6 +253,10 @@ export default function AllComposantsModal({
 
                   <p className="text-sm text-gray-600">
                     Référence : {c.reference}
+                  </p>
+
+                  <p className="text-sm text-gray-600">
+                    Type : {c.type || '-'}
                   </p>
 
                   <p className="text-sm text-gray-600">

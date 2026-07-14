@@ -8,11 +8,13 @@ interface FilterBarProps {
   minQuantite: string;
   maxQuantite: string;
   existe: string;
+  type: string;
   onSearchChange: (value: string) => void;
   onStatusChange: (value: string) => void;
   onMinQuantiteChange: (value: string) => void;
   onMaxQuantiteChange: (value: string) => void;
   onExisteChange: (value: string) => void;
+  onTypeChange: (value: string) => void;
   onReset: () => void;
 }
 
@@ -22,11 +24,13 @@ export default function FilterBar({
   minQuantite,
   maxQuantite,
   existe,
+  type,
   onSearchChange,
   onStatusChange,
   onMinQuantiteChange,
   onMaxQuantiteChange,
   onExisteChange,
+  onTypeChange,
   onReset,
 }: FilterBarProps) {
   return (
@@ -36,7 +40,7 @@ export default function FilterBar({
         <h2 className="text-lg font-semibold text-gray-900">Filtres</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {/* Recherche */}
         <div className="relative">
           <label className="text-xs font-semibold text-gray-700 block mb-2">
@@ -68,6 +72,22 @@ export default function FilterBar({
             <option value="DIS">✓ Disponible</option>
             <option value="IND">✕ Indisponible</option>
             <option value="EN_ATTENTE">⏳ En attente</option>
+          </select>
+        </div>
+
+        {/* Type (LABO/3PH) */}
+        <div>
+          <label className="text-xs font-semibold text-gray-700 block mb-2">
+            Type
+          </label>
+          <select
+            value={type}
+            onChange={(e) => onTypeChange(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          >
+            <option value="">Tous les types</option>
+            <option value="LABO">LABO</option>
+            <option value="3PH">3PH</option>
           </select>
         </div>
 
@@ -104,7 +124,7 @@ export default function FilterBar({
         {/* Type (Existant/Custom) */}
         <div>
           <label className="text-xs font-semibold text-gray-700 block mb-2">
-            Type
+            Catégorie
           </label>
           <select
             value={existe}

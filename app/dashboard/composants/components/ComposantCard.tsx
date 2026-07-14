@@ -11,6 +11,7 @@ interface Composant {
   disponibilite: number;
   description: string | null;
   statut_disponibilite: string;
+  type?: 'LABO' | '3PH';
   created_at: string;
 }
 
@@ -28,6 +29,7 @@ export default function ComposantCard({
   disponibilite,
   description,
   statut_disponibilite,
+  type,
   created_at,
   onEdit,
   onDelete,
@@ -79,7 +81,21 @@ export default function ComposantCard({
 
       {/* Contenu */}
       <div className="p-4">
-        {/* Type */}
+        {/* Type (LABO/3PH) */}
+        <div className="mb-3">
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold ${
+              type === '3PH'
+                ? 'bg-orange-100 text-orange-700'
+                : 'bg-teal-100 text-teal-700'
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${type === '3PH' ? 'bg-orange-500' : 'bg-teal-500'}`}></span>
+            {type === '3PH' ? '3PH' : 'LABO'}
+          </span>
+        </div>
+
+        {/* Type existant/custom */}
         <div className="mb-3">
           <span
             className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold ${
@@ -136,7 +152,7 @@ export default function ComposantCard({
         {/* Boutons d'action */}
         <div className="flex gap-2 pt-3 border-t border-gray-200">
           <button
-            onClick={() => onEdit({ id_composant, nom, reference, image_url, existe, disponibilite, description, statut_disponibilite, created_at })}
+            onClick={() => onEdit({ id_composant, nom, reference, image_url, existe, disponibilite, description, statut_disponibilite, type, created_at })}
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium text-sm transition-colors"
           >
             <Edit2 className="w-4 h-4" />

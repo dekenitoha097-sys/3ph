@@ -19,6 +19,7 @@ interface Composant {
   disponibilite: number;
   description: string | null;
   statut_disponibilite: string;
+  type?: 'LABO' | '3PH';
   created_at: string;
 }
 
@@ -30,6 +31,7 @@ interface CustomComposant {
   disponibilite: number;
   description: string | null;
   statut_disponibilite: string;
+  type?: 'LABO' | '3PH';
   created_at: string;
 }
 
@@ -59,6 +61,7 @@ export default function ComposantsPage() {
   const [minQuantite, setMinQuantite] = useState('');
   const [maxQuantite, setMaxQuantite] = useState('');
   const [existe, setExiste] = useState('');
+  const [type, setType] = useState('');
 
   // Modal édition
   const [editingComposant, setEditingComposant] = useState<Composant | null>(null);
@@ -86,7 +89,7 @@ export default function ComposantsPage() {
   // Réinitialiser offset quand les filtres changent
   useEffect(() => {
     setPagination((prev) => ({ ...prev, offset: 0 }));
-  }, [searchDebounce, status, minQuantite, maxQuantite, existe]);
+  }, [searchDebounce, status, minQuantite, maxQuantite, existe, type]);
 
   // Fonction pour récupérer les composants
   const fetchComposants = useCallback(async () => {
@@ -101,6 +104,7 @@ export default function ComposantsPage() {
       if (minQuantite) params.append('minQuantite', minQuantite);
       if (maxQuantite) params.append('maxQuantite', maxQuantite);
       if (existe) params.append('existe', existe);
+      if (type) params.append('type', type);
 
       params.append('limit', pagination.limit.toString());
       params.append('offset', pagination.offset.toString());
@@ -121,7 +125,7 @@ export default function ComposantsPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchDebounce, status, minQuantite, maxQuantite, existe, pagination.limit, pagination.offset]);
+  }, [searchDebounce, status, minQuantite, maxQuantite, existe, type, pagination.limit, pagination.offset]);
 
   // Charger les composants au montage et quand les filtres changent
   useEffect(() => {
@@ -135,6 +139,7 @@ export default function ComposantsPage() {
     setMinQuantite('');
     setMaxQuantite('');
     setExiste('');
+    setType('');
   };
 
   // Handler pour éditer
@@ -324,11 +329,13 @@ export default function ComposantsPage() {
           minQuantite={minQuantite}
           maxQuantite={maxQuantite}
           existe={existe}
+          type={type}
           onSearchChange={setSearch}
           onStatusChange={setStatus}
           onMinQuantiteChange={setMinQuantite}
           onMaxQuantiteChange={setMaxQuantite}
           onExisteChange={setExiste}
+          onTypeChange={setType}
           onReset={handleResetFilters}
         />
 

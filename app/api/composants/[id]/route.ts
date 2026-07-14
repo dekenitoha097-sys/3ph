@@ -8,6 +8,7 @@ interface UpdateComposantRequest {
   quantite: number;
   Statut_Disponibilite: string;
   commentaire?: string;
+  type?: string;
 }
 
 export async function PUT(
@@ -56,6 +57,13 @@ export async function PUT(
       );
     }
 
+    if (body.type !== undefined && !['LABO', '3PH'].includes(body.type)) {
+      return NextResponse.json(
+        { error: 'Type invalide' },
+        { status: 400 }
+      );
+    }
+
     // Vérifier que le composant existe
     const [[existing]] = await pool.query(
       'SELECT id_composant FROM composant WHERE id_composant = ?',
@@ -78,7 +86,8 @@ export async function PUT(
         photo_lien = ?,
         quantite = ?,
         Statut_Disponibilite = ?,
-        commentaire = ?
+        commentaire = ?,
+        type = ?
       WHERE id_composant = ?
     `;
 
@@ -89,6 +98,7 @@ export async function PUT(
       body.quantite,
       body.Statut_Disponibilite,
       body.commentaire || null,
+      body.type !== undefined ? body.type : 'LABO',
       id
     ]);
 
@@ -103,6 +113,7 @@ export async function PUT(
         quantite AS disponibilite,
         commentaire AS description,
         Statut_Disponibilite AS statut_disponibilite,
+        type,
         created_at
       FROM composant 
       WHERE id_composant = ?`,

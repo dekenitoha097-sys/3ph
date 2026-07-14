@@ -12,6 +12,7 @@ interface Composant {
   disponibilite: number;
   description: string | null;
   statut_disponibilite: string;
+  type?: 'LABO' | '3PH';
   created_at: string;
 }
 
@@ -30,6 +31,7 @@ export default function EditModal({ composant, isOpen, onClose, onSave }: EditMo
     quantite: 0,
     Statut_Disponibilite: 'DIS',
     commentaire: '',
+    type: 'LABO',
   });
 
   const [loading, setLoading] = useState(false);
@@ -45,6 +47,7 @@ export default function EditModal({ composant, isOpen, onClose, onSave }: EditMo
         quantite: composant.disponibilite,
         Statut_Disponibilite: composant.statut_disponibilite,
         commentaire: composant.description || '',
+        type: composant.type || 'LABO',
       });
       setError(null);
     }
@@ -201,6 +204,22 @@ export default function EditModal({ composant, isOpen, onClose, onSave }: EditMo
               <option value="DIS">✓ Disponible</option>
               <option value="IND">✕ Indisponible</option>
               <option value="EN_ATTENTE">⏳ En attente</option>
+            </select>
+          </div>
+
+          {/* Type */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
+              Type
+            </label>
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="LABO">LABO</option>
+              <option value="3PH">3PH</option>
             </select>
           </div>
 

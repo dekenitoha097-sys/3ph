@@ -21,6 +21,7 @@ export async function GET() {
         quantite AS disponibilite,
         commentaire AS description,
         Statut_Disponibilite AS statut_disponibilite,
+        type,
         created_at
       FROM composant 
       WHERE existe = 0

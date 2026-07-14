@@ -19,6 +19,7 @@ export default function CreateComposantModal({
   const [photo_lien, setPhotoLien] = useState('');
   const [quantite, setQuantite] = useState('1');
   const [commentaire, setCommentaire] = useState('');
+  const [type, setType] = useState<'LABO' | '3PH'>('LABO');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState(false);
@@ -49,6 +50,7 @@ export default function CreateComposantModal({
           photo_lien: photo_lien.trim() || null,
           quantite: parseInt(quantite),
           commentaire: commentaire.trim() || null,
+          type,
         }),
       });
 
@@ -63,6 +65,7 @@ export default function CreateComposantModal({
       setPhotoLien('');
       setQuantite('1');
       setCommentaire('');
+      setType('LABO');
       setImagePreview(false);
       setError(null);
 
@@ -148,6 +151,22 @@ export default function CreateComposantModal({
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                 disabled={loading}
               />
+            </div>
+
+            {/* Type */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Type
+              </label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value as 'LABO' | '3PH')}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                disabled={loading}
+              >
+                <option value="LABO">LABO</option>
+                <option value="3PH">3PH</option>
+              </select>
             </div>
 
             {/* Lien image */}

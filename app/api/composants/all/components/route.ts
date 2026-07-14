@@ -13,6 +13,7 @@ export async function GET() {
         c.quantite AS disponibilite,
         c.commentaire AS description,
         c.Statut_Disponibilite AS statut_disponibilite,
+        c.type,
         c.created_at
     FROM composant c 
 `);
